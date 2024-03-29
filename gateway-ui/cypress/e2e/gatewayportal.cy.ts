@@ -5,6 +5,8 @@ describe('template spec', () => {
     return false
   });
 
+  const relayerTestnetAddress = '0x9080846A95CEb93DB4183C544A3961C174168C0A';
+
   beforeEach(() => {
     // Visit the storybook iframe page once per file
     cy.visit('http://localhost:6006/');
@@ -18,8 +20,10 @@ describe('template spec', () => {
     cy.wait(7000);
 
     cy.get('#storybook-preview-iframe', {withinSubject: null, includeShadowDom: true})
-      .its('0.contentDocument.body')
-      .find('[data-test-id=validityChip]').should('be.visible');
+      .its('0.contentDocument.body').find('#validityChip > span').contains('Valid Pass Detected');
+
+    cy.get('#storybook-preview-iframe', {withinSubject: null, includeShadowDom: true})
+      .its('0.contentDocument.body').find('#issuer').contains(relayerTestnetAddress);
   });
 
   it('Correctly renders view when user does not have pass', () => {
