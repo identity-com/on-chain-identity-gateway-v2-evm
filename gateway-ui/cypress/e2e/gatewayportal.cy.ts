@@ -13,7 +13,7 @@ describe('template spec', () => {
   })
 
 
-  it.only('Correctly renders a valid pass', () => {
+  it('Correctly renders a valid pass', () => {
     cy.get('#example-protocol-ui--wallet-with-token').click();
     // Storybook uses an iframe so this extra logic is needed to find the correct component
 
@@ -26,7 +26,7 @@ describe('template spec', () => {
       .its('0.contentDocument.body').find('#issuer').contains(relayerTestnetAddress);
   });
 
-  it('Correctly renders view when user does not have pass', () => {
+  it('Correctly renders view when user does not have pass and can click on a valid gatekeeper', () => {
     cy.get('#example-protocol-ui--wallet-without-token').click();
     // Storybook uses an iframe so this extra logic is needed to find the correct component
 
@@ -34,17 +34,37 @@ describe('template spec', () => {
     
     cy.get('#storybook-preview-iframe', {withinSubject: null, includeShadowDom: true})
       .its('0.contentDocument.body')
-      .find('[data-test-id=validityChip]').should('be.visible');
+      .find('#validityChip > span')
+      .contains('No Pass Detected');
+
+    cy.get('#storybook-preview-iframe', {withinSubject: null, includeShadowDom: true})
+      .its('0.contentDocument.body')
+      .find('#pass-issuer-data > div > div:nth-child(1)').contains('Finclusive');
+    
+    cy.get('#storybook-preview-iframe', {withinSubject: null, includeShadowDom: true})
+      .its('0.contentDocument.body')
+      .find("#validLink")
+      .should("have.attr", "href", "https://finclusive.com/");
+
+    cy.get('#storybook-preview-iframe', {withinSubject: null, includeShadowDom: true})
+      .its('0.contentDocument.body')
+      .find("#validLink")
+      .click()
   });
 
   it('Correctly disables gatekeeper when no DID service found', () => {
     cy.get('#example-protocol-ui--wallet-without-token').click();
-    // Storybook uses an iframe so this extra logic is needed to find the correct component
 
     cy.wait(7000);
-    
+
     cy.get('#storybook-preview-iframe', {withinSubject: null, includeShadowDom: true})
       .its('0.contentDocument.body')
-      .find('[data-test-id=validityChip]').should('be.visible');
+      .find('#validityChip > span')
+      .contains('No Pass Detected');
+
+
+     cy.get('#storybook-preview-iframe', {withinSubject: null, includeShadowDom: true})
+      .its('0.contentDocument.body')
+      .find('#button-0x70997970C51812dc3A010C7d01b50e0d17dc79C8').should('be.disabled');
   });
 })

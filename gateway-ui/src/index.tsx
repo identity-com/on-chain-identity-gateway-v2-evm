@@ -111,10 +111,10 @@ export const PassInfo = (props: PassInfoProps) => {
 
         const passIssuers = invalidPassData.potentialIssuers.map(passIssuer => {
             return (
-                <Grid id={`pass-issuer-${passIssuer.issuerAlias}-data`} item xs={12} key={passIssuer.issuerAlias.toString()}>
+                <Grid id={`pass-issuer-data`} item xs={12} key={passIssuer.issuerAlias.toString()}>
                     <Grid container spacing={2}>
                         <Grid item xs={4}>
-                            <Typography variant='body2' noWrap style={{maxWidth: "50%"}}>
+                            <Typography id={`passId-${passIssuer.issuerAlias}`} variant='body2' noWrap style={{maxWidth: "50%"}}>
                                 {passIssuer.issuerAlias.toString()}
                             </Typography>
                         </Grid>
@@ -123,7 +123,7 @@ export const PassInfo = (props: PassInfoProps) => {
                                 {passIssuer.issuanceFee.toString()}
                             </Typography>
                         </Grid>
-                        <Grid item xs={4}>
+                        <Grid id={`button-${passIssuer.issuerAlias}`} item xs={4}>
                         {
                             passIssuer.passRequestLink.length == 0 ? 
                                 <Button id="invalidLink" variant="contained" disabled={passIssuer.passRequestLink.length == 0}>
