@@ -45,7 +45,7 @@ export const ValidPassIndicator = (props: ValidPassIndicatorProps) => {
     const isValid = props.isValid;
     return(
         <Container maxWidth='md' sx={{display: "flex", justifyContent: "center"}}>
-            <Chip label={isValid ? "Valid Pass Detected" : "No Pass Detected"} color={isValid ? "primary" : "warning"} sx={{fontSize: "1.2rem"}}/>
+            <Chip data-test-id="validityChip" label={isValid ? "Valid Pass Detected" : "No Pass Detected"} color={isValid ? "primary" : "warning"} sx={{fontSize: "1.2rem"}}/>
         </Container>
     )
 }
