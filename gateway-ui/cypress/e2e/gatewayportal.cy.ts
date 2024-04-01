@@ -52,7 +52,7 @@ describe('template spec', () => {
       .click()
   });
 
-  it.only('Correctly disables gatekeeper when no DID service found', () => {
+  it('Correctly disables gatekeeper when no DID service found', () => {
     cy.get('#example-protocol-ui--wallet-without-token').click();
 
     cy.wait(7000);
