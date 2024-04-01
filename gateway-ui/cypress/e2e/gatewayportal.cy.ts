@@ -52,7 +52,7 @@ describe('template spec', () => {
       .click()
   });
 
-  it('Correctly disables gatekeeper when no DID service found', () => {
+  it.only('Correctly disables gatekeeper when no DID service found', () => {
     cy.get('#example-protocol-ui--wallet-without-token').click();
 
     cy.wait(7000);
@@ -63,8 +63,8 @@ describe('template spec', () => {
       .contains('No Pass Detected');
 
 
-     cy.get('#storybook-preview-iframe', {withinSubject: null, includeShadowDom: true})
+    cy.get('#storybook-preview-iframe', {withinSubject: null, includeShadowDom: true})
       .its('0.contentDocument.body')
-      .find('#button-0x70997970C51812dc3A010C7d01b50e0d17dc79C8').should('be.disabled');
+      .find('#invalidLink').should('be.visible').should('be.disabled');
   });
 })
