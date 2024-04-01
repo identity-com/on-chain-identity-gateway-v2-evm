@@ -49,7 +49,9 @@ describe('template spec', () => {
     cy.get('#storybook-preview-iframe', {withinSubject: null, includeShadowDom: true})
       .its('0.contentDocument.body')
       .find("#validLink")
-      .click()
+      .click();
+
+    cy.wait(2000);
   });
 
   it('Correctly disables gatekeeper when no DID service found', () => {
