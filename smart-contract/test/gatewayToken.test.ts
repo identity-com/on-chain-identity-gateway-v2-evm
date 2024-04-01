@@ -24,6 +24,7 @@ import {
   DummyERC20__factory,
   ChargeHandler
 } from '../typechain-types' ;
+import { defaultNetworkDescription } from './utils/network';
 
 describe('GatewayToken', async () => {
   let identityCom: SignerWithAddress;
@@ -94,7 +95,8 @@ describe('GatewayToken', async () => {
         networkFee: {issueFee: 0, refreshFee: 0, expireFee: 0, freezeFee: 0},
         supportedToken: supportedToken ? supportedToken : ZERO_ADDRESS,
         gatekeepers: gatekeepers ? gatekeepers : [],
-        lastFeeUpdateTimestamp: 0
+        lastFeeUpdateTimestamp: 0,
+        description: defaultNetworkDescription
     }
   }
 
