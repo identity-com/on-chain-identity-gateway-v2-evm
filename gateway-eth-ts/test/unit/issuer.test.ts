@@ -28,7 +28,7 @@ nock(TEST_MALFORMED_URL_SERVICE_ENDPOINT)
 .get(ISSUER_CONFIG_PATH)
 .reply(200, {...TEST_ISSUER_CONFIG, gatewayIssuerEndpoint: "ht:/t/sd.do-d.so"});
 
-describe.only("Issuer Config Utility", () => {
+describe("Issuer Config Utility", () => {
 
     it('should correctly resolve test issuer config', async () => {
         const issuerConfig = await resolveIssuerConfigFromServiceEndpoint(TEST_VALID_SERVICE_ENDPOINT);
