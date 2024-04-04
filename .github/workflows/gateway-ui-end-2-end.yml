@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - 'gateway-ui/**'
+      - '.github/**'
 
 jobs:
   interaction-test:
