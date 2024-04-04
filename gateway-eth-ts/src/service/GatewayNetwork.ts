@@ -7,6 +7,7 @@ import {
 } from "../contracts/typechain-types";
 import { BigNumberish, ContractTransaction, Wallet, ethers } from "ethers";
 import { DEFAULT_GAS_LIMIT } from "../utils/constants";
+import { defaultAbiCoder } from "@ethersproject/abi";
 
 export enum GatewayNetworkFeatures {
   REMOVE_GATEKEEPER_INVALIDATES_TOKENS
@@ -103,6 +104,14 @@ export class GatewayNetworkClass {
   async updateFees(networkName: string, newNetworkFeeConfig: IGatewayNetwork.NetworkFeesBpsStruct): Promise<ContractTransaction> {
     return await this.gatewayNetworkContract.updateFees(
         newNetworkFeeConfig,
+        networkName,
+      { gasLimit: DEFAULT_GAS_LIMIT }
+    );
+  }
+
+  async updateDescription(description: string, networkName: string): Promise<ContractTransaction> {
+    return await this.gatewayNetworkContract.updateDescription(
+        defaultAbiCoder.encode(['string'],[description]),
         networkName,
       { gasLimit: DEFAULT_GAS_LIMIT }
     );

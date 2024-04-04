@@ -15,6 +15,7 @@ import {
     DummyERC20__factory, 
 } from '../typechain-types' ;
 import { utils } from 'ethers';
+import { defaultNetworkDescription } from './utils/network';
 
 describe('Gatekeeper', () => {
     let primaryAuthority: SignerWithAddress;
@@ -42,7 +43,8 @@ describe('Gatekeeper', () => {
             networkFee: {issueFee: 0, refreshFee: 0, expireFee: 0, freezeFee: 0},
             supportedToken: ZERO_ADDRESS,
             gatekeepers: gatekeepers ? gatekeepers : [],
-            lastFeeUpdateTimestamp: 0
+            lastFeeUpdateTimestamp: 0,
+            description: defaultNetworkDescription
         }
     }
 

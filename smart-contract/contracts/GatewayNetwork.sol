@@ -205,6 +205,10 @@ contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork, UUPSUpgr
         _networks[networkName].networkFee = fees;
         _networks[networkName].lastFeeUpdateTimestamp = block.timestamp;
     }
+    
+    function updateDescription(bytes calldata description, bytes32 networkName) external override onlyPrimaryNetworkAuthority(networkName) {
+        _networks[networkName].description = description;
+    }
 
     function resetNetworkFeeUpdateTime(bytes32 networkName) external override onlySuperAdmin {
         require(_networks[networkName].primaryAuthority != address(0), "Network does not exist");

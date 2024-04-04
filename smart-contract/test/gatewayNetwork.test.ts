@@ -15,6 +15,8 @@ import {
 } from '../typechain-types' ;
 import { BigNumberish, utils } from 'ethers';
 import { parseEther } from 'ethers/lib/utils';
+import { defaultNetworkDescription } from './utils/network';
+import { toBytes32 } from './utils';
 
 describe('GatewayNetwork', () => {
     let primaryAuthority: SignerWithAddress;
@@ -42,7 +44,8 @@ describe('GatewayNetwork', () => {
             networkFee: {issueFee: 0, refreshFee: 0, expireFee: 0, freezeFee: 0},
             supportedToken: supportedToken ? supportedToken : ZERO_ADDRESS,
             gatekeepers: gatekeepers ? gatekeepers : [],
-            lastFeeUpdateTimestamp: 0
+            lastFeeUpdateTimestamp: 0,
+            description: defaultNetworkDescription
         }
     }
 
@@ -280,6 +283,21 @@ describe('GatewayNetwork', () => {
             expect(updatedNetworkState.networkFee.freezeFee).to.eq(updatedFees.freezeFee);
             expect(updatedNetworkState.lastFeeUpdateTimestamp).to.equal(await time.latest());
         });
+
+        it('can update the description of a network if called by the current primary authority', async () => {
+            const newDescription = toBytes32("new description");
+
+            const initialNetwork = await gatekeeperNetworkContract._networks(defaultNetwork.name);
+            const initialDescription = initialNetwork.description;
+
+            expect(initialDescription).to.not.eq(newDescription);
+
+            await gatekeeperNetworkContract.connect(primaryAuthority).updateDescription(newDescription, defaultNetwork.name, {gasLimit: 300000});
+            const network = await gatekeeperNetworkContract._networks(defaultNetwork.name);
+
+            expect(network.description).to.equal(newDescription);
+        });
+
         it('cannot add a gatekeeper that does not have the minimum amount of global stake', async () => {
             // given
             const newGatekeeper = bob.address;
@@ -383,6 +401,10 @@ describe('GatewayNetwork', () => {
 
             // then
             await expect(gatekeeperNetworkContract.connect(bob).removeGatekeeper(newGatekeeper, defaultNetwork.name, {gasLimit: 300000})).to.be.rejectedWith("Only the primary authority can perform this action");
+        });
+
+        it('cannot update description of a network if not current primary authority', async () => {
+            await expect(gatekeeperNetworkContract.connect(alice).updateDescription(toBytes32("new"), defaultNetwork.name, {gasLimit: 300000})).to.be.rejectedWith("Only the primary authority can perform this action");
         });
 
     })

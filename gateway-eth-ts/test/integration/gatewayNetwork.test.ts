@@ -5,6 +5,7 @@ import { Wallet, ethers } from "ethers";
 import { BaseProvider } from "@ethersproject/providers";
 import { BNB_TESTNET_CONTRACT_ADDRESSES, ZERO_ADDRESS, gatekeeperOneTestnetWallet, gatekeeperTwoTestnetWallet, initTestNetwork, testNetworkName, testNetworkNameWithErc20Fees } from "../utils";
 import { GatewayNetwork, GatewayNetwork__factory } from "../../src/contracts/typechain-types";
+import { defaultAbiCoder } from "@ethersproject/abi";
 
 
 dotenv.config();
@@ -99,6 +100,14 @@ describe("Gateway Network TS class", function () {
             const network = await gatewayNetworkClient.getNetwork(networkId.toString());
 
             assert.equal(network.passExpireDurationInSeconds, newDefaultTime);
+        }).timeout(15000);
+
+        it("should successfully update the description of test network", async function () {
+            const newDescription = 'new description';
+            await gatewayNetworkClient.updateDescription(newDescription,testNetworkNameWithErc20Fees);
+
+            const networkId = await gatewayNetworkClient.getNetworkId(testNetworkNameWithErc20Fees);
+            const network = await gatewayNetworkClient.getNetwork(networkId.toString());
         }).timeout(15000);
 
         it("should successfully update the networks fee % of test network", async function () {
