@@ -25,7 +25,8 @@
   ],
   "ts-node": {
     "compilerOptions": {
-      "module": "commonjs"
+      "module": "commonjs",
+      "types": ["cypress", "cypress-storybook/cypress"]
     }
   }
 }

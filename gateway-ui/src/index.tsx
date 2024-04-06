@@ -45,7 +45,7 @@ export const ValidPassIndicator = (props: ValidPassIndicatorProps) => {
     const isValid = props.isValid;
     return(
         <Container maxWidth='md' sx={{display: "flex", justifyContent: "center"}}>
-            <Chip label={isValid ? "Valid Pass Detected" : "No Pass Detected"} color={isValid ? "primary" : "warning"} sx={{fontSize: "1.2rem"}}/>
+            <Chip id="validityChip" label={isValid ? "Valid Pass Detected" : "No Pass Detected"} color={isValid ? "primary" : "warning"} sx={{fontSize: "1.2rem"}}/>
         </Container>
     )
 }
@@ -59,8 +59,8 @@ interface NetworkInfoProps {
 export const NetworkInfo = (props: NetworkInfoProps) => {
     const { name, description, feeTokenText} = props
     return(
-        <Stack spacing={3} sx={{display: "flex", justifyContent: "center"}}>
-            <Typography variant='h5' sx={{ margin: "0 auto"}}>
+        <Stack id="Network info"spacing={3} sx={{display: "flex", justifyContent: "center"}}>
+            <Typography  variant='h5' sx={{ margin: "0 auto"}}>
                 {"Network: " + name}
             </Typography>
             <TextField id="filled-basic" variant="outlined" disabled={true} defaultValue={description} multiline sx={{width: "100%"}}/>
@@ -82,12 +82,12 @@ export const PassInfo = (props: PassInfoProps) => {
         // Show issuer state
         const { validPassData } = gatewayPortalData;
         return(
-            <Stack mt={3} spacing={2} alignItems={"center"} sx={{display: "flex", justifyContent: "center"}}>
+            <Stack id="valid-pass-data" mt={3} spacing={2} alignItems={"center"} sx={{display: "flex", justifyContent: "center"}}>
                 <Stack direction="row" spacing={3} sx={{display: "flex", justifyContent: "center", alignContent: "center"}}>
                     <Typography variant='body1'>
                         Pass Issuer:
                     </Typography>
-                    <Typography variant='body1' noWrap style={{maxWidth: "25%"}}>
+                    <Typography id="issuer" variant='body1' noWrap style={{maxWidth: "25%"}}>
                         {validPassData.issuerAddress}
                     </Typography>
                     <Button variant="contained">
@@ -108,13 +108,14 @@ export const PassInfo = (props: PassInfoProps) => {
         // Show table of issuers state
         const { invalidPassData } = gatewayPortalData;
 
+
         const passIssuers = invalidPassData.potentialIssuers.map(passIssuer => {
             return (
-                <Grid item xs={12} key={passIssuer.issuerAddress.toString()}>
+                <Grid id={`pass-issuer-data`} item xs={12} key={passIssuer.issuerAlias.toString()}>
                     <Grid container spacing={2}>
                         <Grid item xs={4}>
-                            <Typography variant='body2' noWrap style={{maxWidth: "50%"}}>
-                                {passIssuer.issuerAddress.toString()}
+                            <Typography id={`passId-${passIssuer.issuerAlias}`} variant='body2' noWrap style={{maxWidth: "50%"}}>
+                                {passIssuer.issuerAlias.toString()}
                             </Typography>
                         </Grid>
                         <Grid item xs={4}>
@@ -122,10 +123,19 @@ export const PassInfo = (props: PassInfoProps) => {
                                 {passIssuer.issuanceFee.toString()}
                             </Typography>
                         </Grid>
-                        <Grid item xs={4}>
-                            <Button variant="contained">
-                                Request Pass
-                            </Button>
+                        <Grid id={`button-${passIssuer.issuerAlias}`} item xs={4}>
+                        {
+                            passIssuer.passRequestLink.length == 0 ? 
+                                <Button id="invalidLink" variant="contained" disabled={passIssuer.passRequestLink.length == 0}>
+                                        Request Pass
+                                </Button> 
+                            :
+                                <a id="validLink" href={passIssuer.passRequestLink} target='_blank'>
+                                    <Button variant="contained" disabled={passIssuer.passRequestLink.length == 0}>
+                                        Request Pass
+                                    </Button>
+                                </a>
+                        }
                         </Grid>
                     </Grid>
                 </Grid>
