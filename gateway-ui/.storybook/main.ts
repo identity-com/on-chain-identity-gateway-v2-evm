@@ -1,4 +1,5 @@
 import type { StorybookConfig } from "@storybook/react-webpack5";
+import custom from '../webpack.config.js';
 
 import { join, dirname } from "path";
 
@@ -28,17 +29,12 @@ const config: StorybookConfig = {
   webpackFinal: async (config) => {
     return {
       ...config,
+      module: { ...config.module, rules: [...config.module.rules, ...custom.module.rules] },
       resolve: {
         ...config.resolve,
-        fallback: {
-          "os": require.resolve("os-browserify/browser"),
-          "crypto": require.resolve("crypto-browserify"),
-          "path": require.resolve("path-browserify"),
-          "vm": require.resolve("vm-browserify"),
-          "stream": require.resolve("stream-browserify")
-        }
+        fallback: {...custom.resolve.fallback }
       }
-    }
+    };
   },
   docs: {
     autodocs: "tag",
