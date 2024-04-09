@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Wallet } from "ethers";
+import { Signer, Wallet } from "ethers";
 import { Box, Button, Chip, CircularProgress, Collapse, Container, FormControlLabel, Grid, Stack, TextField, Typography } from '@mui/material';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { GatewayPortalData, useGatewayPortal } from './useGatewayPortal';
@@ -8,7 +8,7 @@ import { ArrowUpward } from '@mui/icons-material';
 
 interface CollapsableGatewayProtocolPortalProps {
     networkName: string;
-    userWallet: Wallet;
+    userWallet: Wallet | Signer;
 }
 
 
