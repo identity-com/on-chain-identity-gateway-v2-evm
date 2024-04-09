@@ -1,17 +1,65 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Wallet } from "ethers";
-import { Box, Button, Chip, CircularProgress, Container, Grid, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, Chip, CircularProgress, Container, FormControlLabel, Grid, Stack, TextField, Typography } from '@mui/material';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { GatewayPortalData, useGatewayPortal } from './useGatewayPortal';
+import { ArrowUpward } from '@mui/icons-material';
 
-interface GatewayProtocolPortalProps {
+
+interface CollapsableGatewayProtocolPortalProps {
     networkName: string;
     userWallet: Wallet;
 }
 
-export const GatewayProtocolPortal = (props: GatewayProtocolPortalProps) => {
+
+export const CollapsableGatewayPortal = (props: CollapsableGatewayProtocolPortalProps) => {
     const { networkName, userWallet } = props;
 
     const gatewayPortalData = useGatewayPortal({networkName, userWallet: userWallet});
+
+    const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
+
+    const isLoading = !gatewayPortalData;
+    const hasValidToken = gatewayPortalData && gatewayPortalData.hasValidPass;
+
+    // Need button to be on both options
+    if(isCollapsed) {
+        return(
+            <CollapsableGatewayButton isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} isValid={hasValidToken} isLoading={isLoading}/>
+        )
+    } else {
+        return(
+            <Stack sx={{alignItems: "center"}}>
+                <CollapsableGatewayButton isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} isValid={hasValidToken} isLoading={isLoading}/>
+                <GatewayProtocolPortal gatewayPortalData={gatewayPortalData} networkName={networkName}/>
+            </Stack>
+        )
+    }
+}
+
+const CollapsableGatewayButton = (props: {isCollapsed: boolean, setIsCollapsed, isValid: boolean, isLoading: boolean}) => {
+    const {isCollapsed, setIsCollapsed, isValid, isLoading } = props;
+    return (
+        <Box>
+            <Button 
+                variant="contained" 
+                endIcon={isCollapsed ? <ArrowDownwardIcon/> : <ArrowUpward/>} 
+                onClick={() => {setIsCollapsed(!isCollapsed)}}
+                color={ isLoading || isValid ? "primary" : "warning"}
+            >
+                Gateway Portal
+            </Button>
+        </Box>
+    )
+}
+
+interface GatewayProtocolPortalProps {
+    networkName: string;
+    gatewayPortalData?: GatewayPortalData
+}
+
+const GatewayProtocolPortal = (props: GatewayProtocolPortalProps) => {
+    const { gatewayPortalData, networkName} = props;
 
     if(!gatewayPortalData) {
         //Loading indicator
@@ -37,11 +85,13 @@ export const GatewayProtocolPortal = (props: GatewayProtocolPortalProps) => {
     )
 }
 
+/////////////// Core UI Views  ////////////////////////////////////////////////////////////////
+
 interface ValidPassIndicatorProps {
     isValid: boolean
 }
 
-export const ValidPassIndicator = (props: ValidPassIndicatorProps) => {
+const ValidPassIndicator = (props: ValidPassIndicatorProps) => {
     const isValid = props.isValid;
     return(
         <Container maxWidth='md' sx={{display: "flex", justifyContent: "center"}}>
@@ -56,7 +106,7 @@ interface NetworkInfoProps {
     feeTokenText: string
 }
 
-export const NetworkInfo = (props: NetworkInfoProps) => {
+const NetworkInfo = (props: NetworkInfoProps) => {
     const { name, description, feeTokenText} = props
     return(
         <Stack id="Network info"spacing={3} sx={{display: "flex", justifyContent: "center"}}>
@@ -75,7 +125,7 @@ interface PassInfoProps {
     gatewayPortalData: GatewayPortalData
 }
 
-export const PassInfo = (props: PassInfoProps) => {
+const PassInfo = (props: PassInfoProps) => {
     const { gatewayPortalData } = props;
 
     if(gatewayPortalData.hasValidPass) {
@@ -130,7 +180,7 @@ export const PassInfo = (props: PassInfoProps) => {
                                         Request Pass
                                 </Button> 
                             :
-                                <a id="validLink" href={passIssuer.passRequestLink} target='_blank'>
+                                <a id="validLink" href={passIssuer.passRequestLink} target='_blank' style={{textDecoration: 'none'}}>
                                     <Button variant="contained" disabled={passIssuer.passRequestLink.length == 0}>
                                         Request Pass
                                     </Button>
