@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Wallet } from "ethers";
-import { Box, Button, Chip, CircularProgress, Container, FormControlLabel, Grid, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, Chip, CircularProgress, Collapse, Container, FormControlLabel, Grid, Stack, TextField, Typography } from '@mui/material';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { GatewayPortalData, useGatewayPortal } from './useGatewayPortal';
 import { ArrowUpward } from '@mui/icons-material';
@@ -22,19 +22,17 @@ export const CollapsableGatewayPortal = (props: CollapsableGatewayProtocolPortal
     const isLoading = !gatewayPortalData;
     const hasValidToken = gatewayPortalData && gatewayPortalData.hasValidPass;
 
-    // Need button to be on both options
-    if(isCollapsed) {
-        return(
-            <CollapsableGatewayButton isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} isValid={hasValidToken} isLoading={isLoading}/>
-        )
-    } else {
-        return(
-            <Stack sx={{alignItems: "center"}}>
-                <CollapsableGatewayButton isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} isValid={hasValidToken} isLoading={isLoading}/>
+    return(
+        <Stack sx={{alignItems: "center"}} spacing={0.5}>
+            <FormControlLabel
+                control={<CollapsableGatewayButton isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} isValid={hasValidToken} isLoading={isLoading}/>}
+                label=""
+            />
+            <Collapse in={!isCollapsed}>
                 <GatewayProtocolPortal gatewayPortalData={gatewayPortalData} networkName={networkName}/>
-            </Stack>
-        )
-    }
+            </Collapse>
+        </Stack>
+    )
 }
 
 const CollapsableGatewayButton = (props: {isCollapsed: boolean, setIsCollapsed, isValid: boolean, isLoading: boolean}) => {
