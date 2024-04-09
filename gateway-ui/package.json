@@ -1,5 +1,5 @@
 {
-  "name": "gateway-ui",
+  "name": "@identity/gateway-ui",
   "version": "1.0.0",
   "description": "UI aspects of the gateway protocol",
   "main": "index.ts",
