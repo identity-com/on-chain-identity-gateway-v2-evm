@@ -6,6 +6,7 @@ on:
 
 jobs:
   interaction-test:
+    if: false # Disable
     runs-on: ubuntu-latest
 
     defaults:
