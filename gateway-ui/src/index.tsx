@@ -23,10 +23,10 @@ export const CollapsableGatewayPortal = (props: CollapsableGatewayProtocolPortal
     const hasValidToken = gatewayPortalData && gatewayPortalData.hasValidPass;
 
     return(
-        <Stack sx={{alignItems: "center"}} spacing={0.5}>
+        <Stack alignItems={"center"} height={"600px"} maxHeight={"900px"}>
             <FormControlLabel
                 control={<CollapsableGatewayButton isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} isValid={hasValidToken} isLoading={isLoading}/>}
-                label=""
+                label=" "
             />
             <Collapse in={!isCollapsed}>
                 <GatewayProtocolPortal gatewayPortalData={gatewayPortalData} networkName={networkName}/>
@@ -70,7 +70,7 @@ const GatewayProtocolPortal = (props: GatewayProtocolPortalProps) => {
 
     const { networkInfo, hasValidPass } = gatewayPortalData;
     return(
-        <Stack sx={{border: hasValidPass ? "2px solid slateblue" : "2px solid #ED6C03", borderRadius: "10px"}} alignItems={"center"} justifyContent={"center"} padding={"1rem"} spacing={3} maxWidth={"750px"}>
+        <Stack sx={{border: hasValidPass ? "2px solid slateblue" : "2px solid #ED6C03", borderRadius: "10px", background: "#FFFEFE", color: "black", zIndex: 1000}} alignItems={"center"} justifyContent={"center"} padding={"1rem"} spacing={2.5} maxWidth={"750px"} mt={"1.5rem"}>
             {/* Section for indicating a valid pass being detected or not */}
             <ValidPassIndicator isValid={gatewayPortalData.hasValidPass}/>
 
