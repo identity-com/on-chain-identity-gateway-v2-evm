@@ -1,5 +1,3 @@
-import React from 'react';
-import reactDom from "react-dom";
+import { CollapsableGatewayPortal as Gateway } from "./index"
 
-// Render empty component so bundler
-reactDom.render(null, document.getElementById("root"));
+export const CollapsableGatewayPortal = Gateway;
