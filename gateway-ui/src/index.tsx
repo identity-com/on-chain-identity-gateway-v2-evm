@@ -6,7 +6,7 @@ import { GatewayPortalData, useGatewayPortal } from './useGatewayPortal';
 import { ArrowUpward } from '@mui/icons-material';
 
 
-export interface CollapsableGatewayProtocolPortalProps {
+interface CollapsableGatewayProtocolPortalProps {
     networkName: string;
     userWallet: Wallet | Signer;
 }

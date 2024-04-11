@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Wallet, ethers } from "ethers";
-import { CollapsableGatewayPortal } from '../index';
+import { CollapsableGatewayPortal } from '..';
+
 
 const foundryDefaultPKWithToken = "0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6"; // One of the 10 default addresses created by foundry. This address has a gateway token
 const publicRPC =  new ethers.providers.JsonRpcProvider("https://bsc-testnet-rpc.publicnode.com	");
