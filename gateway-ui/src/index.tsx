@@ -23,7 +23,7 @@ export const CollapsableGatewayPortal = (props: CollapsableGatewayProtocolPortal
     const hasValidToken = gatewayPortalData && gatewayPortalData.hasValidPass;
 
     return(
-        <Stack alignItems={"center"} height={"600px"} maxHeight={"900px"}>
+        <Stack alignItems={"center"} maxHeight={"900px"}>
             <FormControlLabel
                 control={<CollapsableGatewayButton isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} isValid={hasValidToken} isLoading={isLoading}/>}
                 label=" "
