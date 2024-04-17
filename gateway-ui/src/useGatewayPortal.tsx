@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { GatewayGatekeeper, GatewayNetwork, GatewayTs, TokenState } from "@identity.com/gateway-eth-ts";
 import { DidRegistry } from "@identity.com/did-bnb-client";
-import { Wallet, utils } from 'ethers';
+import { Signer, Wallet, utils } from 'ethers';
 import { BNB_TESTNET_CONTRACT_ADDRESSES, ZERO_ADDRESS } from './utils';
 import { resolveIssuerConfigFromServiceEndpoint } from '@identity.com/gateway-eth-ts/dist/utils/issuer';
 
 export interface GatewayPortalProps {
-    userWallet: Wallet,
+    userWallet: Wallet | Signer,
     networkName: string
 }
 
@@ -39,7 +39,7 @@ export interface GatewayPortalData {
     invalidPassData?: InvalidPassData
 }
 
-const getTokenContractAddresses = async (userWallet: Wallet) => {
+const getTokenContractAddresses = async (userWallet: Wallet | Signer) => {
     const chainId = await userWallet.getChainId();
 
     // BNB testnet
@@ -69,12 +69,14 @@ export const useGatewayPortal = (props: GatewayPortalProps) => {
     useMemo(() => {
 
         const load = async () => {
-            const userAddress = userWallet.address;
+            
+            const userAddress = await userWallet.getAddress();
+            const provider = await userWallet.provider;
             const { network, token, gatekeeper} = await getTokenContractAddresses(userWallet);
 
-            const tokenClient = new GatewayTs(userWallet, token);
-            const networkClient = new GatewayNetwork(userWallet, network);
-            const gatekeeperClient = new GatewayGatekeeper(userWallet,gatekeeper);
+            const tokenClient = new GatewayTs(provider, token);
+            const networkClient = new GatewayNetwork(provider, network);
+            const gatekeeperClient = new GatewayGatekeeper(provider,gatekeeper);
             
             const networkNameInBytes = utils.formatBytes32String(networkName);
 
@@ -139,8 +141,10 @@ export const useGatewayPortal = (props: GatewayPortalProps) => {
 
         const loadGatekeeperIssuerData = async () => {
             // If we need to look up the service endpoint of each gatekeeper
+            const provider = await userWallet.provider;
+
             if(portalData && portalData.invalidPassData) {
-                const didResitry = new DidRegistry(userWallet, BNB_TESTNET_CONTRACT_ADDRESSES.didRegistry, {chainEnvironment: 'testnet'});
+                const didResitry = new DidRegistry(provider, BNB_TESTNET_CONTRACT_ADDRESSES.didRegistry, {chainEnvironment: 'testnet'});
                 const issuers = await Promise.all(portalData.invalidPassData.potentialIssuers.map(async (issuer) => {
                     didResitry.setDidIdentifier(issuer.issuerAlias)
                     // Resolve DID

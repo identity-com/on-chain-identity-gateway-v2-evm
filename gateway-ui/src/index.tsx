@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Wallet } from "ethers";
+import { Signer, Wallet } from "ethers";
 import { Box, Button, Chip, CircularProgress, Collapse, Container, FormControlLabel, Grid, Stack, TextField, Typography } from '@mui/material';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { GatewayPortalData, useGatewayPortal } from './useGatewayPortal';
@@ -8,7 +8,7 @@ import { ArrowUpward } from '@mui/icons-material';
 
 interface CollapsableGatewayProtocolPortalProps {
     networkName: string;
-    userWallet: Wallet;
+    userWallet: Wallet | Signer;
 }
 
 
@@ -23,12 +23,13 @@ export const CollapsableGatewayPortal = (props: CollapsableGatewayProtocolPortal
     const hasValidToken = gatewayPortalData && gatewayPortalData.hasValidPass;
 
     return(
-        <Stack sx={{alignItems: "center"}} spacing={0.5}>
+        <Stack alignItems={"center"} maxHeight={"900px"}>
             <FormControlLabel
                 control={<CollapsableGatewayButton isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} isValid={hasValidToken} isLoading={isLoading}/>}
-                label=""
+                label=" "
+                style={{alignSelf: "end"}}
             />
-            <Collapse in={!isCollapsed}>
+            <Collapse in={!isCollapsed} sx={{zIndex: 1000}}>
                 <GatewayProtocolPortal gatewayPortalData={gatewayPortalData} networkName={networkName}/>
             </Collapse>
         </Stack>
@@ -70,7 +71,7 @@ const GatewayProtocolPortal = (props: GatewayProtocolPortalProps) => {
 
     const { networkInfo, hasValidPass } = gatewayPortalData;
     return(
-        <Stack sx={{border: hasValidPass ? "2px solid slateblue" : "2px solid #ED6C03", borderRadius: "10px"}} alignItems={"center"} justifyContent={"center"} padding={"1rem"} spacing={3} maxWidth={"750px"}>
+        <Stack sx={{border: hasValidPass ? "2px solid slateblue" : "2px solid #ED6C03", borderRadius: "10px", background: "#FFFEFE", color: "black"}} alignItems={"center"} justifyContent={"center"} padding={"1rem"} spacing={2.5} maxWidth={"750px"} mt={"1.5rem"}>
             {/* Section for indicating a valid pass being detected or not */}
             <ValidPassIndicator isValid={gatewayPortalData.hasValidPass}/>
 
