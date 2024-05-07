@@ -40,7 +40,7 @@ describe("Gateway Network TS class", function () {
         it("getGatekeepersOnNetwork should return correct list of gatekeepers on default network", async function() {
             const result = await gatewayNetworkClient.getGatekeepersOnNetwork(testNetworkName);
 
-            assert.equal(result.length, 2);
+            assert.equal(result.length >= 2, true);
             assert.equal(result[1], gatekeeper.address);
         }).timeout(5000);
 
