@@ -1,8 +1,8 @@
 # gateway-eth-ts
 
-[![Version](https://img.shields.io/npm/v/gateway-eth-ts.svg)](https://www.npmjs.com/package/@identity.com/gateway-eth-ts)
-[![Downloads/week](https://img.shields.io/npm/dw/gateway-eth-ts.svg)](https://www.npmjs.com/package/@identity.com/gateway-eth-ts)
-[![License](https://img.shields.io/npm/l/gateway-eth-ts.svg)](https://github.com/identity-com/on-chain-identity-gateway/blob/main/ethereum/gateway-eth-ts/package.json)
+[![Version](https://img.shields.io/npm/v/gateway-eth-ts.svg)](https://www.npmjs.com/package/@identity.com/gateway-evm-ts-client)
+[![Downloads/week](https://img.shields.io/npm/dw/gateway-eth-ts.svg)](https://www.npmjs.com/package/@identity.com/gateway-evm-ts-client)
+[![License](https://img.shields.io/npm/l/gateway-eth-ts.svg)](hhttps://github.com/identity-com/gateway-protocol-evm/blob/develop/gateway-eth-ts/package.json)
 
 # Gateway ETH TS library
 
@@ -11,14 +11,14 @@ Common methods include validation of existing tokens, new gateway token issuance
 
 ## Installation
 
-`yarn add @identity.com/gateway-eth-ts`
+`yarn add @identity.com/gateway-evm-ts-client`
 
 ## Metamask integration example
 
 ```
 import {
   GatewayTs,
-} from "@identity.com/gateway-eth-ts";
+} from "@identity.com/gateway-evm-ts-client";
 import {
   getDefaultProvider,
   Wallet,
