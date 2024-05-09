@@ -20,6 +20,9 @@ jobs:
         with:
           node-version: '20.x'
 
+      - name: Install typechain
+        run: npm install -g @typechain/ethers-v5 && npm install -g typechain
+        
       - name: Install dependencies
         run: yarn
 
