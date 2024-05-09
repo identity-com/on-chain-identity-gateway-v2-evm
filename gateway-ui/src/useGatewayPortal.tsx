@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { GatewayGatekeeper, GatewayNetwork, GatewayTs, TokenState } from "@identity.com/gateway-eth-ts";
+import { GatewayGatekeeper, GatewayNetwork, GatewayTs, TokenState } from "@identity.com/gateway-evm-ts-client";
 import { DidRegistry } from "@identity.com/did-bnb-client";
 import { Signer, Wallet, utils } from 'ethers';
 import { BNB_TESTNET_CONTRACT_ADDRESSES, ZERO_ADDRESS } from './utils';
