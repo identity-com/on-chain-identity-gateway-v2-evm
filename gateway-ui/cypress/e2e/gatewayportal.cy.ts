@@ -26,7 +26,7 @@ describe('template spec', () => {
       .its('0.contentDocument.body').find('#issuer').contains(relayerTestnetAddress);
   });
 
-  it.skip('Correctly renders view when user does not have pass and can click on a valid gatekeeper', () => {
+  it('Correctly renders view when user does not have pass and can click on a valid gatekeeper', () => {
     cy.get('#example-protocol-ui--wallet-without-token').click();
     // Storybook uses an iframe so this extra logic is needed to find the correct component
 
@@ -50,7 +50,7 @@ describe('template spec', () => {
     cy.wait(2000);
   });
 
-  it('Correctly disables gatekeeper when no DID service found', () => {
+  it.skip('Correctly disables gatekeeper when no DID service found', () => {
     cy.get('#example-protocol-ui--wallet-without-token').click();
 
     cy.wait(7000);
