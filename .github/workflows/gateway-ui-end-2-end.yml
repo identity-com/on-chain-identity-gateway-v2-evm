@@ -22,9 +22,9 @@ jobs:
 
       - name: Install typechain
         run: npm install -g @typechain/ethers-v5 && npm install -g typechain
-        
+
       - name: Install dependencies
-        run: yarn
+        run: yarn install
 
       - name: Install Playwright
         run: npx playwright install --with-deps

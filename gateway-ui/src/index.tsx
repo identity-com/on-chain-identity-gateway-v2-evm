@@ -181,7 +181,7 @@ const PassInfo = (props: PassInfoProps) => {
                                         Request Pass
                                 </Button> 
                             :
-                                <a id="validLink" href={passIssuer.passRequestLink} target='_blank' style={{textDecoration: 'none'}}>
+                                <a id={`validLink-${passIssuer.issuerAlias}`} href={passIssuer.passRequestLink} target='_blank' style={{textDecoration: 'none'}}>
                                     <Button variant="contained" disabled={passIssuer.passRequestLink.length == 0} sx={{background: "#1976d2", borderRadius: "4px", color: "white"}}>
                                         Request Pass
                                     </Button>
