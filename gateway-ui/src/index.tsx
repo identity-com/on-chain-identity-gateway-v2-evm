@@ -160,7 +160,6 @@ const PassInfo = (props: PassInfoProps) => {
         // Show table of issuers state
         const { invalidPassData } = gatewayPortalData;
 
-
         const passIssuers = invalidPassData.potentialIssuers.map(passIssuer => {
             return (
                 <Grid id={`pass-issuer-data`} item xs={12} key={passIssuer.issuerAlias.toString()}>
