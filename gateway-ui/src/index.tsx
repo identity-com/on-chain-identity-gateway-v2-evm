@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Signer, Wallet } from "ethers";
-import { Box, Button, Chip, CircularProgress, Collapse, Container, FormControlLabel, Grid, Stack, TextField, Typography } from '@mui/material';
+import { Avatar, Box, Button, Chip, CircularProgress, Collapse, Container, FormControlLabel, Grid, IconButton, Stack, TextField, Typography } from '@mui/material';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { GatewayPortalData, useGatewayPortal } from './useGatewayPortal';
 import { ArrowUpward } from '@mui/icons-material';
+import IconSVG from './identityLogo';
+
 
 
 interface CollapsableGatewayProtocolPortalProps {
@@ -83,6 +85,10 @@ const GatewayProtocolPortal = (props: GatewayProtocolPortalProps) => {
             
             {/* Section for displaying pass info */}
             <PassInfo gatewayPortalData={gatewayPortalData}/>
+
+            <IconButton sx={{maxWidth: "350px", maxHeight: "100px"}}>
+                <IconSVG />
+            </IconButton>
         </Stack>
     )
 }
@@ -142,7 +148,7 @@ const PassInfo = (props: PassInfoProps) => {
                     <Typography id="issuer" variant='body1' noWrap style={{maxWidth: "25%"}}>
                         {validPassData.issuerAddress}
                     </Typography>
-                    <Button variant="contained">
+                    <Button variant="contained" sx={{background: "#1976d2", borderRadius: "4px", color: "white"}}>
                         Learn More
                     </Button>
                 </Stack>
