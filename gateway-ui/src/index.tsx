@@ -86,7 +86,7 @@ const GatewayProtocolPortal = (props: GatewayProtocolPortalProps) => {
             {/* Section for displaying pass info */}
             <PassInfo gatewayPortalData={gatewayPortalData}/>
 
-            <IconButton sx={{maxWidth: "350px", maxHeight: "100px"}}>
+            <IconButton sx={{maxWidth: "320px", maxHeight: "90px"}}  onclick="location.href='https://www.identity.com'">
                 <IconSVG />
             </IconButton>
         </Stack>
