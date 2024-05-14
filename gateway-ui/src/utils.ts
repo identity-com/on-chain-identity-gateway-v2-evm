@@ -6,7 +6,7 @@ export const BNB_TESTNET_CONTRACT_ADDRESSES = {
     gatekeeper: "0x47340b5b62a1c9038aa70dc1e7344be5a59da8af",
     didRegistry: "0x88a05b4370bbb90c9f3eea72a65c77131a7bc18d"
 }
-
+ 
 export const testNetworkName = utils.formatBytes32String("Identity.com KYC Verification");
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
