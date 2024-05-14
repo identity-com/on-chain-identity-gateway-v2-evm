@@ -6,7 +6,6 @@ on:
 
 jobs:
   interaction-test:
-    if: false # Disable
     runs-on: ubuntu-latest
 
     defaults:
@@ -19,10 +18,13 @@ jobs:
 
       - uses: actions/setup-node@v2
         with:
-          node-version: '16.x'
+          node-version: '20.x'
+
+      - name: Install typechain
+        run: npm install -g @typechain/ethers-v5 && npm install -g typechain
 
       - name: Install dependencies
-        run: yarn
+        run: yarn install
 
       - name: Install Playwright
         run: npx playwright install --with-deps
@@ -30,7 +32,8 @@ jobs:
       - name: Build Storybook
         run: yarn build-storybook --quiet
 
+      - name: Start storybook in background
+        run: yarn storybook-quiet &
+
       - name: Serve Storybook and run tests
-        run: |
-            "yarn storybook --quiet --ci" \
-            "npx wait-on tcp:6006 && yarn cypress:run"
+        run: npx wait-on tcp:6006 && yarn cypress:run

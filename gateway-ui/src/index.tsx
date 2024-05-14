@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Signer, Wallet } from "ethers";
-import { Box, Button, Chip, CircularProgress, Collapse, Container, FormControlLabel, Grid, Stack, TextField, Typography } from '@mui/material';
+import { Avatar, Box, Button, Chip, CircularProgress, Collapse, Container, FormControlLabel, Grid, IconButton, Stack, TextField, Typography } from '@mui/material';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { GatewayPortalData, useGatewayPortal } from './useGatewayPortal';
 import { ArrowUpward } from '@mui/icons-material';
+import IconSVG from './identityLogo';
+
 
 
 interface CollapsableGatewayProtocolPortalProps {
@@ -36,6 +38,8 @@ export const CollapsableGatewayPortal = (props: CollapsableGatewayProtocolPortal
     )
 }
 
+export const useGateway = useGatewayPortal;
+
 const CollapsableGatewayButton = (props: {isCollapsed: boolean, setIsCollapsed, isValid: boolean, isLoading: boolean}) => {
     const {isCollapsed, setIsCollapsed, isValid, isLoading } = props;
     return (
@@ -45,6 +49,7 @@ const CollapsableGatewayButton = (props: {isCollapsed: boolean, setIsCollapsed, 
                 endIcon={isCollapsed ? <ArrowDownwardIcon/> : <ArrowUpward/>} 
                 onClick={() => {setIsCollapsed(!isCollapsed)}}
                 color={ isLoading || isValid ? "primary" : "warning"}
+                style={isLoading || isValid ? {backgroundColor: "#1976d2", fontSize: '0.875rem', fontWeight: 500, borderRadius: '4px', color: "white"} : {backgroundColor: "#ed6c02", fontSize: '0.875rem', fontWeight: 500, borderRadius: '4px', color: "white"}}
             >
                 Gateway Portal
             </Button>
@@ -71,7 +76,7 @@ const GatewayProtocolPortal = (props: GatewayProtocolPortalProps) => {
 
     const { networkInfo, hasValidPass } = gatewayPortalData;
     return(
-        <Stack sx={{border: hasValidPass ? "2px solid slateblue" : "2px solid #ED6C03", borderRadius: "10px", background: "#FFFEFE", color: "black"}} alignItems={"center"} justifyContent={"center"} padding={"1rem"} spacing={2.5} maxWidth={"750px"} mt={"1.5rem"}>
+        <Stack sx={{border: hasValidPass ? "2px solid slateblue" : "2px solid #ED6C03", borderRadius: "10px", background: "#FFFEFE", color: "black", borderWidth: "2px"}} alignItems={"center"} justifyContent={"center"} padding={"1rem"} spacing={2.5} minWidth={"700px"} mt={"1.5rem"}>
             {/* Section for indicating a valid pass being detected or not */}
             <ValidPassIndicator isValid={gatewayPortalData.hasValidPass}/>
 
@@ -80,11 +85,18 @@ const GatewayProtocolPortal = (props: GatewayProtocolPortalProps) => {
             
             {/* Section for displaying pass info */}
             <PassInfo gatewayPortalData={gatewayPortalData}/>
+
+            <IconButton sx={{maxWidth: "320px", maxHeight: "90px"}}  onClick={(e) => {
+                e.preventDefault();
+                window.location.href='http://identity.com';
+            }}>
+                <IconSVG />
+            </IconButton>
         </Stack>
     )
 }
 
-/////////////// Core UI Views  ////////////////////////////////////////////////////////////////
+/////////////// Core UI Views  //////////////////////////////////////////////////////////////
 
 interface ValidPassIndicatorProps {
     isValid: boolean
@@ -94,7 +106,7 @@ const ValidPassIndicator = (props: ValidPassIndicatorProps) => {
     const isValid = props.isValid;
     return(
         <Container maxWidth='md' sx={{display: "flex", justifyContent: "center"}}>
-            <Chip id="validityChip" label={isValid ? "Valid Pass Detected" : "No Pass Detected"} color={isValid ? "primary" : "warning"} sx={{fontSize: "1.2rem"}}/>
+            <Chip id="validityChip" label={isValid ? "Valid Pass Detected" : "No Pass Detected"} color={isValid ? "primary" : "warning"} sx={{fontSize: "1.2rem", backgroundColor: isValid ? "#1976d2" : "#ed6c02", color: "white"}}/>
         </Container>
     )
 }
@@ -108,12 +120,12 @@ interface NetworkInfoProps {
 const NetworkInfo = (props: NetworkInfoProps) => {
     const { name, description, feeTokenText} = props
     return(
-        <Stack id="Network info"spacing={3} sx={{display: "flex", justifyContent: "center"}}>
+        <Stack id="Network info"spacing={3} sx={{display: "flex", justifyContent: "center", fontSize: "24px", fontWeight: 400}}>
             <Typography  variant='h5' sx={{ margin: "0 auto"}}>
                 {"Network: " + name}
             </Typography>
-            <TextField id="filled-basic" variant="outlined" disabled={true} defaultValue={description} multiline sx={{width: "100%"}}/>
-            <Typography variant='body1' style={{marginLeft: 0, marginTop: "1 rem", marginRight: 0}}>
+            <TextField id="filled-basic" variant="outlined" disabled={true} defaultValue={description} multiline style={{width: "100%", borderWidth: "1px", borderRadius: "3px"}}/>
+            <Typography variant='body1' style={{marginLeft: 0, marginTop: "1 rem", marginRight: 0, fontSize: '16px', fontWeight: 400}}>
                 {"Fee Token: " + feeTokenText}
             </Typography>
         </Stack>
@@ -139,7 +151,7 @@ const PassInfo = (props: PassInfoProps) => {
                     <Typography id="issuer" variant='body1' noWrap style={{maxWidth: "25%"}}>
                         {validPassData.issuerAddress}
                     </Typography>
-                    <Button variant="contained">
+                    <Button variant="contained" sx={{background: "#1976d2", borderRadius: "4px", color: "white"}}>
                         Learn More
                     </Button>
                 </Stack>
@@ -157,30 +169,29 @@ const PassInfo = (props: PassInfoProps) => {
         // Show table of issuers state
         const { invalidPassData } = gatewayPortalData;
 
-
         const passIssuers = invalidPassData.potentialIssuers.map(passIssuer => {
             return (
                 <Grid id={`pass-issuer-data`} item xs={12} key={passIssuer.issuerAlias.toString()}>
                     <Grid container spacing={2}>
                         <Grid item xs={4}>
-                            <Typography id={`passId-${passIssuer.issuerAlias}`} variant='body2' noWrap style={{maxWidth: "50%"}}>
+                            <Typography id={`passId-${passIssuer.issuerAlias}`} variant='body2' noWrap style={{maxWidth: "50%", marginTop: "3px"}}>
                                 {passIssuer.issuerAlias.toString()}
                             </Typography>
                         </Grid>
                         <Grid item xs={4}>
-                            <Typography variant='body2'>
+                            <Typography variant='body2' style={{marginTop: "3px"}}>
                                 {passIssuer.issuanceFee.toString()}
                             </Typography>
                         </Grid>
                         <Grid id={`button-${passIssuer.issuerAlias}`} item xs={4}>
                         {
                             passIssuer.passRequestLink.length == 0 ? 
-                                <Button id="invalidLink" variant="contained" disabled={passIssuer.passRequestLink.length == 0}>
+                                <Button id="invalidLink" variant="contained" disabled={passIssuer.passRequestLink.length == 0} style={{backgroundColor: "#E4E3E3", color: "#AFAEAE", borderRadius: "4px"}}>
                                         Request Pass
                                 </Button> 
                             :
-                                <a id="validLink" href={passIssuer.passRequestLink} target='_blank' style={{textDecoration: 'none'}}>
-                                    <Button variant="contained" disabled={passIssuer.passRequestLink.length == 0}>
+                                <a id={`validLink-${passIssuer.issuerAlias}`} href={passIssuer.passRequestLink} target='_blank' style={{textDecoration: 'none'}}>
+                                    <Button variant="contained" disabled={passIssuer.passRequestLink.length == 0} sx={{background: "#1976d2", borderRadius: "4px", color: "white"}}>
                                         Request Pass
                                     </Button>
                                 </a>
@@ -192,7 +203,7 @@ const PassInfo = (props: PassInfoProps) => {
         });
 
         return(
-            <Grid container spacing={2} alignItems={"center"} sx={{display: "flex", justifyContent: "center", maxWidth: "70%"}}>
+            <Grid container spacing={2} alignItems={"center"} sx={{display: "flex", justifyContent: "center", maxWidth: "77%"}}>
                 <Grid item xs={4}>
                     <Typography variant='body1'>
                         Pass Issuer
@@ -204,7 +215,6 @@ const PassInfo = (props: PassInfoProps) => {
                     </Typography>
                 </Grid>
                 <Grid item xs={4}> </Grid>
-                
                 {
                     passIssuers
                 }

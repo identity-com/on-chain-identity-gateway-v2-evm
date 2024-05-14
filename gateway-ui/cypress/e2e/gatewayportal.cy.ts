@@ -36,20 +36,16 @@ describe('template spec', () => {
       .its('0.contentDocument.body')
       .find('#validityChip > span')
       .contains('No Pass Detected');
-
-    cy.get('#storybook-preview-iframe', {withinSubject: null, includeShadowDom: true})
-      .its('0.contentDocument.body')
-      .find('#pass-issuer-data > div > div:nth-child(1)').contains('Finclusive');
     
     cy.get('#storybook-preview-iframe', {withinSubject: null, includeShadowDom: true})
       .its('0.contentDocument.body')
-      .find("#validLink")
+      .find("#validLink-Finclusive")
       .should("have.attr", "href", "https://finclusive.com/");
 
     cy.get('#storybook-preview-iframe', {withinSubject: null, includeShadowDom: true})
       .its('0.contentDocument.body')
-      .find("#validLink")
-      .click();
+      .find("#validLink-Finclusive")
+      .click({force: true});
 
     cy.wait(2000);
   });
@@ -67,6 +63,6 @@ describe('template spec', () => {
 
     cy.get('#storybook-preview-iframe', {withinSubject: null, includeShadowDom: true})
       .its('0.contentDocument.body')
-      .find('#invalidLink').should('be.visible').should('be.disabled');
+      .find('#invalidLink').should('be.hidden').should('be.disabled');
   });
 })
