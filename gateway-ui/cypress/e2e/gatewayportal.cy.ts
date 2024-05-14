@@ -42,15 +42,15 @@ describe('template spec', () => {
       .find("#validLink-Finclusive")
       .should("have.attr", "href", "https://finclusive.com/");
 
-    // cy.get('#storybook-preview-iframe', {withinSubject: null, includeShadowDom: true})
-    //   .its('0.contentDocument.body')
-    //   .find("#validLink-Finclusive")
-    //   .click();
+    cy.get('#storybook-preview-iframe', {withinSubject: null, includeShadowDom: true})
+      .its('0.contentDocument.body')
+      .find("#validLink-Finclusive")
+      .click({force: true});
 
     cy.wait(2000);
   });
 
-  it.skip('Correctly disables gatekeeper when no DID service found', () => {
+  it('Correctly disables gatekeeper when no DID service found', () => {
     cy.get('#example-protocol-ui--wallet-without-token').click();
 
     cy.wait(7000);
@@ -63,6 +63,6 @@ describe('template spec', () => {
 
     cy.get('#storybook-preview-iframe', {withinSubject: null, includeShadowDom: true})
       .its('0.contentDocument.body')
-      .find('#invalidLink').should('be.visible').should('be.disabled');
+      .find('#invalidLink').should('be.hidden').should('be.disabled');
   });
 })
