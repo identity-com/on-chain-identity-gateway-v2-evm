@@ -27,8 +27,10 @@
     "@storybook/react-webpack5": "^7.6.17",
     "@storybook/test": "^7.6.17",
     "babel-loader": "^9.1.3",
+    "copy-webpack-plugin": "^12.0.2",
     "crypto-browserify": "^3.12.0",
     "cypress": "^13.7.1",
+    "file-loader": "^6.2.0",
     "init": "^0.1.2",
     "os-browserify": "^0.3.0",
     "path-browserify": "^1.0.1",
@@ -48,7 +50,7 @@
   },
   "dependencies": {
     "@fontsource/roboto": "^5.0.12",
-    "@identity.com/did-bnb-client": "^2.0.0-beta",
+    "@identity.com/did-bnb-client": "^2.0.2-beta",
     "@identity.com/gateway-evm-ts-client": "^0.1.1",
     "ethers": "^5.7.0"
   },
@@ -68,6 +70,7 @@
     "build-storybook": "storybook build",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
-    "build": "webpack --mode production"
+    "build": "webpack --mode production",
+    "install-skip-build": "SKIP_BUILD=1 yarn install"
   }
 }
