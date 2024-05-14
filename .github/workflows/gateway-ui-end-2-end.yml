@@ -33,7 +33,7 @@ jobs:
         run: yarn build-storybook --quiet
 
       - name: Start storybook in background
-        run: yarn storybook --quiet --ci
+        run: yarn storybook-quiet
 
       - name: Serve Storybook and run tests
         run: npx wait-on tcp:6006 && yarn cypress:run
