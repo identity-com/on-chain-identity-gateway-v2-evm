@@ -80,3 +80,15 @@ if (!verifier.verifyToken(addressToVerify, gatekeeperNetwork)) {
 // some logic
 }
 ```
+
+## BNB Testnet Deployments
+| Contract Name    | Proxy Address | Implementation Address|
+| -------- | ------- | ------- |
+| GatewayToken  | 0xc25e8e4fd1a892e6c6883ea8e6f3c3eb3b115f44 | 0x44e23414d49e6e5dbe548e3e75754a4907a3755a |
+| Gateway Network |0xcbb5c0536bc80c6983cfaab2574685b5f3b679cb     |0x1fcacbfe05fe81df130fbf91c4f7389401940ecf|
+| Gatekeeper    |0x47340b5b62a1c9038aa70dc1e7344be5a59da8af|0xee16c34eb2642087598d474a29b1041f4fe40399|
+| Gateway Staking    |0xf1311706736cf9e75992252e2ab2824f530f847b   |0x1e3d0ef055bc39397121265392154d358fd72972|
+| Trusted Forwarder    |N/A   |0x96b905ff1edfadaec03879450f3dc35a8124dc05|
+| Flags Storage    |0x06c9d91b3acc1d2434342242c987064e555ffe8a   |0xfc70a8096d7c9f6c36030199c32cb40806b73edc  |
+| Charge Handler    |0xdc3f03b401826feaa80bdca3c3cb2d5816a5bc77  |0xe0923d2afb98da565bd253ec776e3ac7477c90ff|
+| Dummy ERC-20 Token   |N/A |0xf380c37eff6c5ab0593927dff4bc7af6428d541f|
