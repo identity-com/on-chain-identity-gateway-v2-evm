@@ -168,8 +168,8 @@ export class GatewayTsInternal<
     return result.data != "0";
   }
 
-  async getFirstTokenOnNetwork(owner: string, network: bigint): Promise<TokenData | null> {
-    const [tokenId] = await this.getTokenIdsByOwnerAndNetwork(owner, network);
+  async getFirstTokenOnNetwork(owner: string, network: bigint, onlyActive: boolean = false): Promise<TokenData | null> {
+    const [tokenId] = await this.getTokenIdsByOwnerAndNetwork(owner, network, onlyActive);
     if (!tokenId) return null;
 
     const rawData = await this.gatewayTokenContract.getToken(
