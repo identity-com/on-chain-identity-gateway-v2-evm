@@ -48,10 +48,10 @@ jobs:
       #   run: yarn lint
 
       - name: Build dependencies
-        run: yarn prebuild
+        run: (cd ../smart-contract && yarn && yarn build)
 
       - name: Create Typechain Typescript type
-        run: yarn copy-contracts
+        run: yarn prebuild
 
       - name: Run Anvil Node
         run: anvil --fork-url ${{ vars.BNB_TESTNET_RPC_URL }} &
