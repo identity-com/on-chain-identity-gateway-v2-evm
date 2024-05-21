@@ -3,7 +3,7 @@ import { Wallet, ethers } from "ethers";
 import { CollapsableGatewayPortal } from '..';
 
 
-const foundryDefaultPKWithToken = "0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6"; // One of the 10 default addresses created by foundry. This address has a gateway token
+const foundryDefaultPKWithToken = "0x35993999f8c2237011bd36ae3329c7169d0c3763432c6efe6584ef0a8f22fa65"; // One of the 10 default addresses created by foundry. This address has a gateway token
 const publicRPC =  new ethers.providers.JsonRpcProvider("https://bsc-testnet-rpc.publicnode.com	");
 
 // const gatewayIssuerServiceOnTestnet = {
