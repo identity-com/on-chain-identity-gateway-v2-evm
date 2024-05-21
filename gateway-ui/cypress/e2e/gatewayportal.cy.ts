@@ -5,7 +5,7 @@ describe('template spec', () => {
     return false
   });
 
-  const relayerTestnetAddress = '0x9080846A95CEb93DB4183C544A3961C174168C0A';
+  const issuerTestnetAddress = '0xa0Ee7A142d267C1f36714E4a8F75612F20a79720';
 
   beforeEach(() => {
     // Visit the storybook iframe page once per file
@@ -23,7 +23,7 @@ describe('template spec', () => {
       .its('0.contentDocument.body').find('#validityChip > span').contains('Valid Pass Detected');
 
     cy.get('#storybook-preview-iframe', {withinSubject: null, includeShadowDom: true})
-      .its('0.contentDocument.body').find('#issuer').contains(relayerTestnetAddress);
+      .its('0.contentDocument.body').find('#issuer').contains(issuerTestnetAddress);
   });
 
   it('Correctly renders view when user does not have pass and can click on a valid gatekeeper', () => {
