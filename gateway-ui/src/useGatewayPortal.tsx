@@ -92,7 +92,7 @@ export const useGatewayPortal = (props: GatewayPortalProps) => {
             // set state
 
             if(hasValidToken) {
-                const tokenData = await tokenClient.getFirstTokenOnNetwork(userAddress, networkId.valueOf() as bigint);
+                const tokenData = await tokenClient.getFirstTokenOnNetwork(userAddress, networkId.valueOf() as bigint, true);
                 const tokenGatekeeper = await tokenClient.getTokenGatekeeper(tokenData.tokenId.toString());
 
                 const feeTokenAddress = await networkResponse.supportedToken;
