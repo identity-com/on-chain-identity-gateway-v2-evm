@@ -95,8 +95,9 @@ describe('GatewayNetwork', () => {
             const defaultNetwork = getDefaultNetwork(primaryAuthority.address, [alice.address]);
             await gatekeeperNetworkContract.connect(deployer).createNetwork(defaultNetwork, {gasLimit: 300000});
 
-            const isGatekeeper = await gatekeeperNetworkContract.isGateKeeper(defaultNetwork.name, alice.address);
+            await gatekeeperNetworkContract.connect(primaryAuthority).addGatekeeper(alice.address, defaultNetwork.name, {gasLimit: 300000});
 
+            const isGatekeeper = await gatekeeperNetworkContract.isGateKeeper(defaultNetwork.name, alice.address);
             expect(isGatekeeper).to.be.true;
         });
         it('cannot create a new network zero address primary authority', async () => {

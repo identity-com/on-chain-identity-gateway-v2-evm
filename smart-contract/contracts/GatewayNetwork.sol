@@ -53,6 +53,10 @@ contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork {
         
         _networks[networkName] = network;
         _networks[networkName].lastFeeUpdateTimestamp = block.timestamp;
+         // reset gatekeeper list so that primary authority can add gatekeepers manually
+         // The creator os the network probably won't be the primary authority of the network so they can't initialize gatekeepers
+        _networks[networkName].gatekeepers = new address[](20);
+
 
         emit GatekeeperNetworkCreated(network.primaryAuthority, networkName, network.passExpireDurationInSeconds);
     } 
@@ -111,6 +115,12 @@ contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork {
         delete _networks[networkName];
 
         emit GatekeeperNetworkDeleted(networkName);
+    }
+
+    function addGatekeepers(address[] memory gatekeepers, bytes32 networkName) external override {
+        for(uint i = 0; i < gatekeepers.length; i++) {
+            this.addGatekeeper(gatekeepers[i], networkName);
+        }
     }
 
     function addGatekeeper(address gatekeeper, bytes32 networkName) external override onlyPrimaryNetworkAuthority(networkName){
