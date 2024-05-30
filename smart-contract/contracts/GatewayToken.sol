@@ -178,6 +178,10 @@ contract GatewayToken is
         _setChargeHandler(chargeHandler);
     }
 
+    function updateNetworkContractAddress(address networkContractAddress) external onlySuperAdmin {
+        _setNetworkContractAddress(networkContractAddress);
+    }
+
     /**
      * @dev Triggers to burn gateway token
      * @param tokenId Gateway token id
@@ -447,6 +451,17 @@ contract GatewayToken is
         _chargeHandler = IChargeHandler(chargeHandler);
 
         emit ChargeHandlerUpdated(chargeHandler);
+    }
+
+    /**
+     * @dev Internal function to set gatewayNetwork Contract address
+     * @param gatewayNetworkContractAddress ChargeHandler contract address
+     */
+    function _setNetworkContractAddress(address gatewayNetworkContractAddress) internal {
+        if (gatewayNetworkContractAddress == address(0)) {
+            revert Common__MissingAccount();
+        }
+        _gatewayNetworkContract = gatewayNetworkContractAddress;
     }
 
     function _handleCharge(FeeType feeType, uint networkId, address gatekeeper, ChargeParties memory partiesInCharge) internal checkGatekeeperHasMinimumStake(gatekeeper){
