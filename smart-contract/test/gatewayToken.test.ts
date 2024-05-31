@@ -24,6 +24,7 @@ import {
   DummyERC20__factory,
   ChargeHandler
 } from '../typechain-types' ;
+import { defaultNetworkDescription } from './utils/network';
 
 describe('GatewayToken', async () => {
   let identityCom: SignerWithAddress;
@@ -94,7 +95,8 @@ describe('GatewayToken', async () => {
         networkFee: {issueFee: 0, refreshFee: 0, expireFee: 0, freezeFee: 0},
         supportedToken: supportedToken ? supportedToken : ZERO_ADDRESS,
         gatekeepers: gatekeepers ? gatekeepers : [],
-        lastFeeUpdateTimestamp: 0
+        lastFeeUpdateTimestamp: 0,
+        description: defaultNetworkDescription
     }
   }
 
@@ -104,6 +106,9 @@ describe('GatewayToken', async () => {
 
   before('deploy contracts', async () => {
     [identityCom, alice, bob, carol, gatekeeper] = await ethers.getSigners();
+
+    // Silence warnings from upgradable contracts with immutable variables
+    await upgrades.silenceWarnings();
 
     const forwarderFactory = await ethers.getContractFactory('FlexibleNonceForwarder');
     const flagsStorageFactory = await ethers.getContractFactory('FlagsStorage');
@@ -118,20 +123,26 @@ describe('GatewayToken', async () => {
     forwarder = await forwarderFactory.deploy(100);
     await forwarder.deployed();
 
-    gatekeeperContract = await gatekeeperContractFactory.deploy();
+    gatekeeperContract = await upgrades.deployProxy(gatekeeperContractFactory, [identityCom.address], { kind: 'uups', unsafeAllow: ['state-variable-immutable']}) as Gatekeeper;
     await gatekeeperContract.deployed();
 
     dummyErc20Contract = await dummyERC20Factory.deploy('DummyToken', 'DT', 10000000000, identityCom.address);
         await dummyErc20Contract.deployed();
 
-    gatewayStakingContract = await gatewayStakingFactory.deploy(dummyErc20Contract.address, 'GatewayProtocolShares', 'GPS');
+    gatewayStakingContract = await upgrades.deployProxy(gatewayStakingFactory, [identityCom.address], 
+      {
+        kind: 'uups', 
+        constructorArgs: [dummyErc20Contract.address, 'GatewayProtocolShares', 'GPS'],
+        unsafeAllow: ['state-variable-immutable', 'constructor']
+      }) as GatewayStaking;
+
     await gatewayStakingContract.deployed();
 
     flagsStorage = await upgrades.deployProxy(flagsStorageFactory, [identityCom.address], { kind: 'uups' });
     await flagsStorage.deployed();
 
     chargeHandler = await upgrades.deployProxy(chargeHandlerFactory, [identityCom.address], { kind: 'uups' }) as ChargeHandler;
-    gatewayNetwork = await gatewayNetworkFactory.connect(identityCom).deploy(gatekeeperContract.address, gatewayStakingContract.address);
+    gatewayNetwork = await upgrades.deployProxy(gatewayNetworkFactory, [identityCom.address, gatekeeperContract.address, gatewayStakingContract.address], {kind: 'uups', unsafeAllow: ['state-variable-immutable']}) as GatewayNetwork;
     
     await chargeHandler.deployed();
     await gatewayNetwork.deployed();
@@ -783,22 +794,22 @@ describe('GatewayToken', async () => {
     });
 
     it('freeze token', async () => {
-      await gatewayToken.connect(gatekeeper).freeze(dummyWalletTokenId, { tokenSender: ZERO_ADDRESS, recipient: gatekeeper.address});
+      await gatewayToken.connect(gatekeeper).freeze(dummyWalletTokenId);
 
       return expect(await checkVerification(dummyWallet, gkn1)).to.be.false;
     });
 
     it('freeze token - revert if already frozen', async () => {
-      await gatewayToken.connect(gatekeeper).freeze(dummyWalletTokenId, { tokenSender: ZERO_ADDRESS, recipient: gatekeeper.address});
+      await gatewayToken.connect(gatekeeper).freeze(dummyWalletTokenId);
 
-      await expect(gatewayToken.connect(gatekeeper).freeze(dummyWalletTokenId, { tokenSender: ZERO_ADDRESS, recipient: gatekeeper.address})).to.be.revertedWithCustomError(
+      await expect(gatewayToken.connect(gatekeeper).freeze(dummyWalletTokenId)).to.be.revertedWithCustomError(
         gatewayToken,
         'GatewayToken__TokenDoesNotExistOrIsInactive',
       );
     });
 
     it('unfreeze token', async () => {
-      await gatewayToken.connect(gatekeeper).freeze(dummyWalletTokenId, { tokenSender: ZERO_ADDRESS, recipient: gatekeeper.address});
+      await gatewayToken.connect(gatekeeper).freeze(dummyWalletTokenId);
 
       await gatewayToken.connect(gatekeeper).unfreeze(dummyWalletTokenId, { tokenSender: ZERO_ADDRESS, recipient: gatekeeper.address});
 
@@ -820,11 +831,11 @@ describe('GatewayToken', async () => {
       });
       const dummyWalletTokenIds = await gatewayToken.getTokenIdsByOwnerAndNetwork(alice.address, gkn1, true);
 
-      await gatewayToken.connect(gatekeeper).freeze(dummyWalletTokenIds[0], { tokenSender: ZERO_ADDRESS, recipient: gatekeeper.address});
+      await gatewayToken.connect(gatekeeper).freeze(dummyWalletTokenIds[0]);
 
       expect(await checkVerification(alice.address, gkn1)).to.be.true;
 
-      await gatewayToken.connect(gatekeeper).freeze(dummyWalletTokenIds[1], { tokenSender: ZERO_ADDRESS, recipient: gatekeeper.address});
+      await gatewayToken.connect(gatekeeper).freeze(dummyWalletTokenIds[1]);
 
       expect(await checkVerification(alice.address, gkn1)).to.be.false;
 
@@ -888,7 +899,7 @@ describe('GatewayToken', async () => {
     });
 
     it('revoke a token', async () => {
-      await gatewayToken.connect(gatekeeper).revoke(dummyWalletTokenId, { tokenSender: ZERO_ADDRESS, recipient: gatekeeper.address});
+      await gatewayToken.connect(gatekeeper).revoke(dummyWalletTokenId);
       return expect(await checkVerification(dummyWallet, gkn1)).to.be.false;
     });
 
@@ -911,7 +922,7 @@ describe('GatewayToken', async () => {
       });
       const dummyWalletTokenIds = await gatewayToken.getTokenIdsByOwnerAndNetwork(dummyWallet, gkn1, true);
 
-      await gatewayToken.connect(gatekeeper).revoke(dummyWalletTokenIds[0], { tokenSender: ZERO_ADDRESS, recipient: gatekeeper.address});
+      await gatewayToken.connect(gatekeeper).revoke(dummyWalletTokenIds[0]);
 
       let validity = await gatewayToken.callStatic['verifyToken(uint256)'](dummyWalletTokenIds[0]);
       expect(validity).to.equal(false);
@@ -1132,7 +1143,7 @@ describe('GatewayToken', async () => {
         tokenSender: ZERO_ADDRESS,
       });
       const [tokenId] = await gatewayToken.getTokenIdsByOwnerAndNetwork(userToBeFrozen.address, gkn1, true);
-      await gatewayToken.connect(gatekeeper).freeze(tokenId, { tokenSender: ZERO_ADDRESS, recipient: gatekeeper.address});
+      await gatewayToken.connect(gatekeeper).freeze(tokenId);
       expect(await checkVerification(userToBeFrozen.address, gkn1)).to.be.false;
 
       // create a forwarded metatx to unfreeze the user
@@ -1145,7 +1156,7 @@ describe('GatewayToken', async () => {
           .connect(alice)
           .execute(forwardedUnfreezeTx.request, forwardedUnfreezeTx.signature, { gasLimit: 1000000 })
       ).wait;
-      await gatewayToken.connect(gatekeeper).freeze(tokenId, { tokenSender: ZERO_ADDRESS, recipient: gatekeeper.address});
+      await gatewayToken.connect(gatekeeper).freeze(tokenId);
       expect(await checkVerification(userToBeFrozen.address, gkn1)).to.be.false;
 
       // cannot replay the unfreeze transaction

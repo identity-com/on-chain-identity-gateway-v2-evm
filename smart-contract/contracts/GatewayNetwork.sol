@@ -8,9 +8,9 @@ import {BitMask} from "./library/BitMask.sol";
 import { IGatewayNetwork } from "./interfaces/IGatewayNetwork.sol";
 import { IGatewayGatekeeper } from './interfaces/IGatewayGatekeeper.sol';
 import { IGatewayStaking } from './interfaces/IGatewayStaking.sol';
+import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-
-contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork {
+contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork, UUPSUpgradeable {
     using BitMask for uint256;
     using SafeERC20 for IERC20;
 
@@ -29,17 +29,16 @@ contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork {
         _;
     }
 
-    constructor(address gatewayGatekeeperContractAddress, address gatewayStakingContractAddress) {
-        // Contract deployer is the initial super admin
-        _superAdmins[msg.sender] = true;
+    function initialize(address owner, address gatewayGatekeeperContractAddress, address gatewayStakingContractAddress) initializer public {
+        _superAdmins[owner] = true;
 
         // Allow contract deployer to set NETWORK_FEE_PAYER_ROLE role
-        _grantRole(DEFAULT_ADMIN_ROLE, 0, msg.sender);
+        _grantRole(DEFAULT_ADMIN_ROLE, 0, owner);
         _setRoleAdmin(NETWORK_FEE_PAYER_ROLE, 0, DEFAULT_ADMIN_ROLE);
 
         _gatewayGatekeeperContractAddress = gatewayGatekeeperContractAddress;
         _gatewayGatekeeperStakingContractAddress = gatewayStakingContractAddress;
-    }
+   }
    
     function createNetwork(GatekeeperNetworkData calldata network) external override onlySuperAdmin {
         bytes32 networkName = network.name;
@@ -216,6 +215,10 @@ contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork {
         _networks[networkName].networkFee = fees;
         _networks[networkName].lastFeeUpdateTimestamp = block.timestamp;
     }
+    
+    function updateDescription(bytes calldata description, bytes32 networkName) external override onlyPrimaryNetworkAuthority(networkName) {
+        _networks[networkName].description = description;
+    }
 
     function resetNetworkFeeUpdateTime(bytes32 networkName) external override onlySuperAdmin {
         require(_networks[networkName].primaryAuthority != address(0), "Network does not exist");
@@ -270,4 +273,6 @@ contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork {
     receive() external payable {
         revert GatewayNetwork_Cannot_Be_Sent_Eth_Directly();
     }
+
+    function _authorizeUpgrade(address) internal override onlySuperAdmin {}
 }

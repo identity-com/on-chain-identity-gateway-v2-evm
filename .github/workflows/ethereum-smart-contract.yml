@@ -4,7 +4,6 @@ on:
     paths:
       - 'smart-contract/**'
       - '.github/**'
-  pull_request:
 jobs:
   ethereum-gateway-smart-contract-test:
     name: Build and test the ethereum smart-contract code on ${{ matrix.node }} and ${{ matrix.os }}
@@ -12,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        node: ['16.x']
+        node: ['20.x']
         os: [ubuntu-latest]
         
     defaults:
@@ -51,4 +50,4 @@ jobs:
         env:
           PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
           INFURA_KEY: ${{ secrets.INFURA_KEY }}
-        run: yarn test
+        run: yarn coverage

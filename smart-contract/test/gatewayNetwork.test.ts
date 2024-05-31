@@ -1,4 +1,4 @@
-import { ethers } from 'hardhat';
+import { ethers, upgrades } from 'hardhat';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { time } from "@nomicfoundation/hardhat-network-helpers";
@@ -15,6 +15,8 @@ import {
 } from '../typechain-types' ;
 import { BigNumberish, utils } from 'ethers';
 import { parseEther } from 'ethers/lib/utils';
+import { defaultNetworkDescription } from './utils/network';
+import { toBytes32 } from './utils';
 
 describe('GatewayNetwork', () => {
     let primaryAuthority: SignerWithAddress;
@@ -42,7 +44,8 @@ describe('GatewayNetwork', () => {
             networkFee: {issueFee: 0, refreshFee: 0, expireFee: 0, freezeFee: 0},
             supportedToken: supportedToken ? supportedToken : ZERO_ADDRESS,
             gatekeepers: gatekeepers ? gatekeepers : [],
-            lastFeeUpdateTimestamp: 0
+            lastFeeUpdateTimestamp: 0,
+            description: defaultNetworkDescription
         }
     }
 
@@ -53,21 +56,30 @@ describe('GatewayNetwork', () => {
     beforeEach('setup', async () => {
         [deployer, primaryAuthority, alice, bob, stableCoin, networkFeePayer] = await ethers.getSigners();
 
+        // Silence warnings from upgradable contracts with immutable variables
+        await upgrades.silenceWarnings();
+
         const gatewayNetworkFactory = await new GatewayNetwork__factory(deployer);
         const gatekeeperContractFactory = await new Gatekeeper__factory(deployer);
         const gatewayStakingFactory = await new GatewayStaking__factory(deployer);
         const dummyERC20Factory = await new DummyERC20__factory(deployer);
 
-        gatekeeperContract = await gatekeeperContractFactory.deploy();
+        gatekeeperContract = await upgrades.deployProxy(gatekeeperContractFactory, [deployer.address], { kind: 'uups'}) as Gatekeeper;
         await gatekeeperContract.deployed();
 
         dummyErc20Contract = await dummyERC20Factory.deploy('DummyToken', 'DT', parseEther(`1000`), deployer.address);
         await dummyErc20Contract.deployed();
 
-        gatewayStakingContract = await gatewayStakingFactory.deploy(dummyErc20Contract.address, 'GatewayProtocolShares', 'GPS');
+        gatewayStakingContract = await upgrades.deployProxy(gatewayStakingFactory, [deployer.address], 
+            {
+              kind: 'uups', 
+              constructorArgs: [dummyErc20Contract.address, 'GatewayProtocolShares', 'GPS'],
+              unsafeAllow: ['state-variable-immutable', 'constructor']
+            }) as GatewayStaking;
+
         await gatewayStakingContract.deployed();
 
-        gatekeeperNetworkContract = await gatewayNetworkFactory.deploy(gatekeeperContract.address, gatewayStakingContract.address);
+        gatekeeperNetworkContract = await upgrades.deployProxy(gatewayNetworkFactory, [deployer.address, gatekeeperContract.address, gatewayStakingContract.address], {kind: 'uups'}) as GatewayNetwork;
         await gatekeeperNetworkContract.deployed();
 
         await gatekeeperContract.setNetworkContractAddress(gatekeeperNetworkContract.address);
@@ -272,6 +284,21 @@ describe('GatewayNetwork', () => {
             expect(updatedNetworkState.networkFee.freezeFee).to.eq(updatedFees.freezeFee);
             expect(updatedNetworkState.lastFeeUpdateTimestamp).to.equal(await time.latest());
         });
+
+        it('can update the description of a network if called by the current primary authority', async () => {
+            const newDescription = toBytes32("new description");
+
+            const initialNetwork = await gatekeeperNetworkContract._networks(defaultNetwork.name);
+            const initialDescription = initialNetwork.description;
+
+            expect(initialDescription).to.not.eq(newDescription);
+
+            await gatekeeperNetworkContract.connect(primaryAuthority).updateDescription(newDescription, defaultNetwork.name, {gasLimit: 300000});
+            const network = await gatekeeperNetworkContract._networks(defaultNetwork.name);
+
+            expect(network.description).to.equal(newDescription);
+        });
+
         it('cannot add a gatekeeper that does not have the minimum amount of global stake', async () => {
             // given
             const newGatekeeper = bob.address;
@@ -375,6 +402,10 @@ describe('GatewayNetwork', () => {
 
             // then
             await expect(gatekeeperNetworkContract.connect(bob).removeGatekeeper(newGatekeeper, defaultNetwork.name, {gasLimit: 300000})).to.be.rejectedWith("Only the primary authority can perform this action");
+        });
+
+        it('cannot update description of a network if not current primary authority', async () => {
+            await expect(gatekeeperNetworkContract.connect(alice).updateDescription(toBytes32("new"), defaultNetwork.name, {gasLimit: 300000})).to.be.rejectedWith("Only the primary authority can perform this action");
         });
 
     })

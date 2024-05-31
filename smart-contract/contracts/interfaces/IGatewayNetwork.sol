@@ -15,8 +15,10 @@ abstract contract  IGatewayNetwork {
         uint16 freezeFee;
     }
 
-    uint16 MAX_FEE_BPS = 10000; // 100%
-    uint256 public FEE_CONFIG_DELAY_TIME = 7 days;
+    /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
+    uint16 immutable MAX_FEE_BPS = 10000; // 100%
+    /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
+    uint256 public immutable FEE_CONFIG_DELAY_TIME = 7 days;
 
     /**
      * @dev This struct represents data associated with the state of a gatekeeper network
@@ -43,6 +45,7 @@ abstract contract  IGatewayNetwork {
 
         address[] gatekeepers;
         uint256 lastFeeUpdateTimestamp;
+        bytes description;
     }
 
     enum NetworkFeature {
@@ -79,6 +82,7 @@ abstract contract  IGatewayNetwork {
     function claimPrimaryAuthority(bytes32 networkName) external virtual;
     function updateNetworkFeatures(uint256 newFeatureMask, bytes32 networkName) external virtual;
     function updateFees(NetworkFeesBps calldata fees, bytes32 networkName) external virtual;
+    function updateDescription(bytes calldata description, bytes32 networkName) external virtual;
     function resetNetworkFeeUpdateTime(bytes32 networkName) external virtual;
     function networkHasFeature(bytes32 networkName, NetworkFeature feature) public view virtual returns (bool);
     function getNetwork(uint networkId) external view virtual returns(GatekeeperNetworkData memory);

@@ -178,6 +178,10 @@ contract GatewayToken is
         _setChargeHandler(chargeHandler);
     }
 
+    function updateNetworkContractAddress(address networkContractAddress) external onlySuperAdmin {
+        _setNetworkContractAddress(networkContractAddress);
+    }
+
     /**
      * @dev Triggers to burn gateway token
      * @param tokenId Gateway token id
@@ -225,7 +229,7 @@ contract GatewayToken is
         _handleCharge(FeeType.ISSUE, network, gatekeeper, partiesInCharge);
     }
 
-    function revoke(uint tokenId, ChargeParties memory partiesInCharge) external virtual override {
+    function revoke(uint tokenId) external virtual override {
         _checkGatekeeper(slotOf(tokenId));
 
         _tokenStates[tokenId] = TokenState.REVOKED;
@@ -238,7 +242,7 @@ contract GatewayToken is
      * @dev Triggers to freeze gateway token
      * @param tokenId Gateway token id
      */
-    function freeze(uint tokenId, ChargeParties memory partiesInCharge) external virtual {
+    function freeze(uint tokenId) external virtual {
         _checkGatekeeper(slotOf(tokenId));
 
         _freeze(tokenId);
@@ -311,7 +315,7 @@ contract GatewayToken is
      * Checks owner has any token on gateway token contract, `tokenId` still active, and not expired.
      */
     function verifyToken(address owner, uint network) external virtual returns (bool) {
-        (uint[] memory tokenIds, uint count) = _getTokenIdsByOwnerAndNetwork(owner, network, true);
+        (, uint count) = _getTokenIdsByOwnerAndNetwork(owner, network, true);
         return count > 0;
     }
 
@@ -449,6 +453,17 @@ contract GatewayToken is
         emit ChargeHandlerUpdated(chargeHandler);
     }
 
+    /**
+     * @dev Internal function to set gatewayNetwork Contract address
+     * @param gatewayNetworkContractAddress ChargeHandler contract address
+     */
+    function _setNetworkContractAddress(address gatewayNetworkContractAddress) internal {
+        if (gatewayNetworkContractAddress == address(0)) {
+            revert Common__MissingAccount();
+        }
+        _gatewayNetworkContract = gatewayNetworkContractAddress;
+    }
+
     function _handleCharge(FeeType feeType, uint networkId, address gatekeeper, ChargeParties memory partiesInCharge) internal checkGatekeeperHasMinimumStake(gatekeeper){
         IGatewayGatekeeper.GatekeeperNetworkData memory gatekeeperData = IGatewayGatekeeper(_gatekeeperContract).getGatekeeperNetworkData(bytes32(networkId), gatekeeper);
         IGatewayNetwork.GatekeeperNetworkData memory networkData = IGatewayNetwork(_gatewayNetworkContract).getNetwork(networkId);
@@ -478,7 +493,7 @@ contract GatewayToken is
         }
     }
 
-    function _resolveTotalFeeAmount(FeeType feeType, IGatewayGatekeeper.GatekeeperNetworkData memory gatekeeperData, IGatewayNetwork.GatekeeperNetworkData memory networkData) internal returns(uint256, uint16) {
+    function _resolveTotalFeeAmount(FeeType feeType, IGatewayGatekeeper.GatekeeperNetworkData memory gatekeeperData, IGatewayNetwork.GatekeeperNetworkData memory networkData) internal pure returns(uint256, uint16) {
         uint256 totalFeeAmount;
         uint16 networkFeeBps;
 
