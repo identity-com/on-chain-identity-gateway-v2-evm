@@ -38,6 +38,10 @@ export class GatewayNetworkClass {
     this.providerOrWallet = providerOrWallet;
   }
 
+  async createNetwork(networkInfo: IGatewayNetwork.GatekeeperNetworkDataStruct): Promise<ContractTransaction> {
+    return await this.gatewayNetworkContract.createNetwork(networkInfo, { gasLimit: DEFAULT_GAS_LIMIT });
+  }
+
   async withdrawNetworkFees(networkName: string): Promise<ContractTransaction> {
     return await this.gatewayNetworkContract.withdrawNetworkFees(
       networkName,
