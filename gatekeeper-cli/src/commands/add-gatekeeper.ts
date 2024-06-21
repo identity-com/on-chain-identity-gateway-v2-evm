@@ -4,9 +4,10 @@ import {
   gatewayTokenAddressFlag,
   chainFlag, parseFlagsWithPrivateKey,
   privateKeyFlag, gasLimitFlag,
+  gatewayNetworkAddressFlag,
 } from '../utils/oclif/flags'
 import {Command, Flags} from '@oclif/core'
-import {makeGatewayTs} from '../utils/oclif/utils'
+import {makeGatewayNetworkTs} from '../utils/oclif/utils'
 import {addressArg} from '../utils/oclif/args'
 
 export default class AddGatekeeper extends Command {
@@ -22,13 +23,18 @@ export default class AddGatekeeper extends Command {
     privateKey: privateKeyFlag(),
     gatewayTokenAddress: gatewayTokenAddressFlag(),
     gatekeeperNetwork: gatekeeperNetworkFlag(),
+    gatewayNetworkAddress: gatewayNetworkAddressFlag(),
     chain: chainFlag(),
     fees: feesFlag(),
     gasLimit: gasLimitFlag(),
     confirmations: confirmationsFlag(),
   };
 
-  static args = [addressArg({description: 'Gatekeeper address to add to the gatekeeper network'})];
+  static args = [addressArg({
+      description: 'Gatekeeper address to add to the gatekeeper network'
+    }), 
+    {name: 'networkName', required: true, description: 'Name of the network'}
+  ];
 
   async run(): Promise<void> {
     const {args, flags} = await this.parse(AddGatekeeper)
@@ -38,10 +44,10 @@ export default class AddGatekeeper extends Command {
 
     this.log(`Adding:
 			gatekeeper ${gatekeeper}
-			to network ${parsedFlags.gatekeeperNetwork}`)
+			to network ${args.networkName}`)
 
-    const gateway = await makeGatewayTs(parsedFlags)
-    const sendableTransaction = await gateway.addGatekeeper(gatekeeper, parsedFlags.gatekeeperNetwork)
+    const gatewayNetwork = await makeGatewayNetworkTs(parsedFlags)
+    const sendableTransaction = await gatewayNetwork.addGatekeeper(args.networkName, gatekeeper)
 
     const receipt = await sendableTransaction.wait(flags.confirmations)
 
