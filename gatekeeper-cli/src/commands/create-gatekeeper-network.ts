@@ -1,10 +1,11 @@
 import {Command, Flags} from '@oclif/core'
 
-import {makeGatewayTs} from '../utils/oclif/utils'
+import { makeGatewayNetworkTs } from '../utils/oclif/utils'
 import {
   confirmationsFlag, DEFAULT_GATEKEEPER_NETWORK,
   feesFlag, gatewayTokenAddressFlag, chainFlag, parseFlagsWithPrivateKey,
   privateKeyFlag, gasLimitFlag,
+  gatewayNetworkAddressFlag,
 } from '../utils/oclif/flags'
 
 export default class CreateGatekeeperNetwork extends Command {
@@ -20,14 +21,19 @@ export default class CreateGatekeeperNetwork extends Command {
     privateKey: privateKeyFlag(),
     chain: chainFlag(),
     gatewayTokenAddress: gatewayTokenAddressFlag(),
+    gatewayNetworkAddress: gatewayNetworkAddressFlag(),
     fees: feesFlag(),
     gasLimit: gasLimitFlag(),
     confirmations: confirmationsFlag(),
   };
 
   static args = [
-    {name: 'id', required: true, description: 'ID of the new network'},
     {name: 'name', required: true, description: 'Name of the new network'},
+    {name: 'primaryAuthority', required: true, description: 'EOA that will be the admin on the network'},
+    {name: 'passExpireDurationInSeconds', required: true, description: 'Default expiration of passes on this network. This value can be overriden by gatekeepers'},
+    {name: 'defaultFee', required: false, description: 'Default fee amount on pass issuance, refresh, expiration and freezing'},
+    {name: 'supportedToken', required: false, description: 'ERC20 token address that will be used for fees. The zero address represents native ether. Default token is native ether.'},
+    {name: 'description', required: true, description: 'Description of the network.'}
   ];
 
   async run(): Promise<void> {
@@ -37,12 +43,28 @@ export default class CreateGatekeeperNetwork extends Command {
 
     const parsedFlags = parseFlagsWithPrivateKey({...flags, gatekeeperNetwork: DEFAULT_GATEKEEPER_NETWORK})
 
-    this.log(`Creating gatekeeper network:
-			id ${args.id}
-			name ${args.name}`)
+    this.log(`Creating gatekeeper network: name ${args.name}`)
 
-    const gateway = await makeGatewayTs(parsedFlags)
-    const sendableTransaction = await gateway.createNetwork(args.name, BigInt(args.id), false)
+    const gatewayNetwork = await makeGatewayNetworkTs(parsedFlags)
+
+    const createNetworkInput = {
+      primaryAuthority: args.primaryAuthority,
+      name: args.name,
+      passExpireDurationInSeconds: args.passExpireDurationInSeconds,
+      networkFeatureMask: 0,
+      networkFee: {
+        issueFee: args.defaultFee,
+        refreshFee: args.defaultFee,
+        expireFee: args.defaultFee,
+        freezeFee: args.defaultFee
+      },
+      supportedToken: args.supportedToken,
+      gatekeepers: [],
+      lastFeeUpdateTimestamp: 0,
+      description: args.description
+    }
+
+    const sendableTransaction = await gatewayNetwork.createNetwork(createNetworkInput)
 
     const receipt = await sendableTransaction.wait(confirmations)
 
