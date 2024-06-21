@@ -149,7 +149,7 @@ export const networks = {
     url: 'https://bscrpc.com',
     chainId: 56,
   },
-  binanceTestnetSmartChain: {
+  binanceSmartChainTestnet: {
     url: 'https://bsc-testnet-rpc.publicnode.com',
     chainId: 97,
   }
