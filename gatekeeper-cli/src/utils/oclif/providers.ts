@@ -145,6 +145,14 @@ export const networks = {
     url: 'https://base.llamarpc.com',
     chainId: 8453,
   },
+  binanceSmartChain: {
+    url: 'https://bscrpc.com',
+    chainId: 56,
+  },
+  binanceTestnetSmartChain: {
+    url: 'https://bsc-testnet-rpc.publicnode.com',
+    chainId: 97,
+  }
 }
 
 class ExtendedInfuraProvider extends InfuraProvider {
