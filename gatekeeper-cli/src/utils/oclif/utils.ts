@@ -3,6 +3,7 @@ import {getSigner} from './signer'
 import { GatewayTs, TokenData, GatewayNetwork } from "@identity.com/gateway-evm-ts-client";
 import {BigNumber} from '@ethersproject/bignumber'
 import {estimateGasPrice, GasPriceKey} from './gas'
+import { getAddress } from '@ethersproject/address';
 
 export const makeGatewayTs = async ({
   provider,
@@ -29,7 +30,7 @@ export const makeGatewayNetworkTs = async ({
   const signer = privateKey ? getSigner(privateKey, provider) : undefined
   const feeAmount = readOnly ? {} : await estimateGasPrice(provider, fees)
   const providerOrWallet = readOnly ? provider : signer || provider
-  return new GatewayNetwork(providerOrWallet, gatewayNetworkAddress)
+  return new GatewayNetwork(providerOrWallet, getAddress(gatewayNetworkAddress))
 }
 
 export const checkedGetToken = async (

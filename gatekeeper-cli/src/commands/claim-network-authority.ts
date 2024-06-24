@@ -1,4 +1,4 @@
-import {Command, Flags} from '@oclif/core'
+import {Args, Command, Flags} from '@oclif/core'
 
 import {makeGatewayNetworkTs} from '../utils/oclif/utils'
 import {
@@ -9,7 +9,8 @@ import {
   privateKeyFlag, gasLimitFlag,
   gatewayNetworkAddressFlag,
 } from '../utils/oclif/flags'
-import {addressArg} from '../utils/oclif/args'
+import { getSigner } from '../utils/oclif/signer';
+import { utils } from 'ethers';
 
 export default class ClaimNetworkAuthority extends Command {
   static description = 'Transfer network primary authority';
@@ -31,24 +32,28 @@ export default class ClaimNetworkAuthority extends Command {
     confirmations: confirmationsFlag(),
   };
 
-  static args = [
-    {name: 'networkName', required: true, description: 'Name of the network'}
-  ];
+  static args = {
+    networkName: Args.string({name: 'networkName', required: true, description: 'Name of the network'})
+  }
+  
   async run(): Promise<void> {
     const {args, flags} = await this.parse(ClaimNetworkAuthority)
 
     const confirmations = flags.confirmations
 
-    const authority = args.address as string
-    const networkName = args.networkName as string;
+    const networkName = args.networkName;
     const parsedFlags = parseFlagsWithPrivateKey(flags)
+
+    const signer = getSigner(parsedFlags.privateKey, parsedFlags.provider)
+    
+    const authority = signer.address
 
     this.log(`Adding:
 			authority ${authority}
 			to network ${parsedFlags.gatekeeperNetwork}`)
 
-      const gatewayNetwork = await makeGatewayNetworkTs(parsedFlags)
-    const sendableTransaction = await gatewayNetwork.claimPrimaryAuthority(networkName);
+    const gatewayNetwork = await makeGatewayNetworkTs(parsedFlags)
+    const sendableTransaction = await gatewayNetwork.claimPrimaryAuthority(utils.formatBytes32String(networkName));
 
     const receipt = await sendableTransaction.wait(confirmations)
 

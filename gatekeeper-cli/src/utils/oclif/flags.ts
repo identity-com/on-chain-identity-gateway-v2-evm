@@ -38,21 +38,21 @@ export const gatewayTokenAddressFlag = Flags.custom<string>({
 })
 
 export const gatewayNetworkAddressFlag = Flags.custom<string>({
-  char: 'n',
+  char: 'a',
   name: 'gateway-network-address',
   env: 'GATEWAY_NETWORK_ADDRESS',
   parse: async (input: string) => {
     if (!isAddress(input)) throw new Error('Invalid Gateway Network address')
     return input
   },
-  required: true,
+  required: false,
   description: 'GatewayNetwork address to target (or set GATEWAY_NETWORK_ADDRESS environment variable)',
 })
 
 export const chainFlag = Flags.custom<BaseProvider>({
   char: 'c',
+  name: 'chain',
   parse: async (input: string) => getProvider(input as keyof typeof networks),
-  default: async () => getProvider(process.env.DEFAULT_CHAIN as keyof typeof networks || 'ethereum'),
   options: Object.keys(networks),
   description: 'Specify target chain to work with (or set DEFAULT_CHAIN environment variable)',
 })

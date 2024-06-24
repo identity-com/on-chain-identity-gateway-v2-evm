@@ -10,8 +10,8 @@ type ExtendedNetwork = Network & {url: string}
 
 export const networks = {
   localhost: {
-    url: 'http://localhost:8545/',
-    chainId: 31_337,
+    url: 'http://127.0.0.1:8545',
+    chainId: 97,
   },
   ethereum: {
     url: 'https://mainnet.infura.io/v3/',
@@ -178,7 +178,6 @@ class ExtendedInfuraProvider extends InfuraProvider {
 export const getProvider = function (
   network:  keyof typeof networks,
 ): BaseProvider {
-  if (network === 'localhost') return getLocalhostProvider()
 
   const url = networks[network].url
   if (url.includes('infura')) {
