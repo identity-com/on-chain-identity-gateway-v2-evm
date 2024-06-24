@@ -1,0 +1,44 @@
+# name: EVM cli client
+# on:
+#   push:
+#     paths:
+#       - 'gatekeeper-cli/**'
+#       - '.github/**'
+
+# jobs:
+#   ethereum-build:
+#     name: Build, lint and test the ethereum libraries on ${{ matrix.os }}
+
+#     runs-on: ${{ matrix.os }}
+#     strategy:
+#       matrix:
+#         node: ['20.x']
+#         os: [ubuntu-latest]
+
+#     defaults:
+#       run:
+#         working-directory: ./gatekeeper-cli
+
+#     steps:
+#       - name: Checkout repo
+#         uses: actions/checkout@v2
+
+#       - name: Install Foundry
+#         uses: foundry-rs/foundry-toolchain@v1
+
+#       - name: Use Node ${{ matrix.node }}
+#         uses: actions/setup-node@v1
+#         with:
+#           node-version: ${{ matrix.node }}
+
+#       - name: Install
+#         run: yarn
+
+#       - name: Run Anvil Node
+#         run: anvil --fork-url ${{ vars.BNB_TESTNET_RPC_URL }} &
+
+#       - name: Run build
+#         run: yarn build
+
+#       - name: Test
+#         run: yarn test
