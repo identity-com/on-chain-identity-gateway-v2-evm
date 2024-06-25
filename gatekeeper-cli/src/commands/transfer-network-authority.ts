@@ -49,13 +49,13 @@ export default class TransferNetworkAuthority extends Command {
 			authority ${authority}
 			to network ${parsedFlags.gatekeeperNetwork}`)
 
-      const gatewayNetwork = await makeGatewayNetworkTs(parsedFlags)
+    const gatewayNetwork = await makeGatewayNetworkTs(parsedFlags)
     const sendableTransaction = await gatewayNetwork.updatePrimaryAuthority(networkName, authority);
 
     const receipt = await sendableTransaction.wait(confirmations)
 
     this.log(
-      `Added network authority to Gateway Token contract. TxHash: ${receipt.transactionHash}`,
+      `Transferring network authority to Gateway Token contract. TxHash: ${receipt.transactionHash}`,
     )
   }
 }

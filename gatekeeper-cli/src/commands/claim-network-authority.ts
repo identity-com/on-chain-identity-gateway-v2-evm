@@ -58,7 +58,7 @@ export default class ClaimNetworkAuthority extends Command {
     const receipt = await sendableTransaction.wait(confirmations)
 
     this.log(
-      `Added network authority to Gateway Token contract. TxHash: ${receipt.transactionHash}`,
+      `Claim network authority to Gateway Token contract. TxHash: ${receipt.transactionHash}`,
     )
   }
 }
