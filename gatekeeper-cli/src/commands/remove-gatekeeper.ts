@@ -4,10 +4,11 @@ import {
   gatewayTokenAddressFlag,
   chainFlag, parseFlagsWithPrivateKey,
   privateKeyFlag, gasLimitFlag,
+  gatewayNetworkAddressFlag,
 } from '../utils/oclif/flags'
-import {Command, Flags} from '@oclif/core'
-import {makeGatewayTs} from '../utils/oclif/utils'
-import {addressArg} from '../utils/oclif/args'
+import {Args, Command, Flags} from '@oclif/core'
+import {makeGatewayNetworkTs} from '../utils/oclif/utils'
+import { utils } from 'ethers';
 
 export default class RemoveGatekeeper extends Command {
   static description = 'Remove a gatekeeper from a gatekeeper network';
@@ -22,26 +23,31 @@ export default class RemoveGatekeeper extends Command {
     privateKey: privateKeyFlag(),
     gatewayTokenAddress: gatewayTokenAddressFlag(),
     gatekeeperNetwork: gatekeeperNetworkFlag(),
+    gatewayNetworkAddress: gatewayNetworkAddressFlag(),
     chain: chainFlag(),
     fees: feesFlag(),
     gasLimit: gasLimitFlag(),
     confirmations: confirmationsFlag(),
   };
 
-  static args = [addressArg({description: 'Gatekeeper address to remove from the gatekeeper network'})];
+  static args = {
+    address: Args.string({name: 'address', required: true, description: 'Gatekeeper address to add to the gatekeeper network'}),
+    networkName: Args.string({name: 'networkName', required: true, description: 'Name of the network'})
+  }
 
   async run(): Promise<void> {
     const {args, flags} = await this.parse(RemoveGatekeeper)
 
-    const gatekeeper: string = args.address as string
+    const gatekeeper: string = args.address;
     const parsedFlags = parseFlagsWithPrivateKey(flags)
 
     this.log(`Removing:
 			gatekeeper ${gatekeeper}
-			from network ${parsedFlags.gatekeeperNetwork}`)
+			from network ${args.networkName}`)
 
-    const gateway = await makeGatewayTs(parsedFlags)
-    const sendableTransaction = await gateway.removeGatekeeper(gatekeeper, parsedFlags.gatekeeperNetwork)
+    const gatewayNetwork = await makeGatewayNetworkTs(parsedFlags)
+
+    const sendableTransaction = await gatewayNetwork.removeGatekeeper(utils.formatBytes32String(args.networkName), gatekeeper)
 
     const receipt = await sendableTransaction.wait(flags.confirmations)
 

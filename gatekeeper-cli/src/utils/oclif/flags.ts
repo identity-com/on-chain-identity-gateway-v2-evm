@@ -37,10 +37,22 @@ export const gatewayTokenAddressFlag = Flags.custom<string>({
   description: 'GatewayToken address to target (or set GATEWAY_TOKEN_ADDRESS environment variable)',
 })
 
+export const gatewayNetworkAddressFlag = Flags.custom<string>({
+  char: 'a',
+  name: 'gateway-network-address',
+  env: 'GATEWAY_NETWORK_ADDRESS',
+  parse: async (input: string) => {
+    if (!isAddress(input)) throw new Error('Invalid Gateway Network address')
+    return input
+  },
+  required: false,
+  description: 'GatewayNetwork address to target (or set GATEWAY_NETWORK_ADDRESS environment variable)',
+})
+
 export const chainFlag = Flags.custom<BaseProvider>({
   char: 'c',
+  name: 'chain',
   parse: async (input: string) => getProvider(input as keyof typeof networks),
-  default: async () => getProvider(process.env.DEFAULT_CHAIN as keyof typeof networks || 'ethereum'),
   options: Object.keys(networks),
   description: 'Specify target chain to work with (or set DEFAULT_CHAIN environment variable)',
 })
@@ -90,6 +102,7 @@ export const gasLimitFlag = Flags.custom<BigNumber>({
 type Flags = {
   chain: Provider | undefined
   gatewayTokenAddress: string | undefined
+  gatewayNetworkAddress: string | undefined
   gatekeeperNetwork: number | undefined
   fees?: GasPriceKey | undefined
   gasLimit?: BigNumber | undefined
@@ -99,11 +112,13 @@ export const parseFlags = (flags: Flags) => {
   // These all have defaults and can therefore be safely cast
   const provider = flags.chain as Provider
   const gatewayTokenAddress = flags.gatewayTokenAddress as string
+  const gatewayNetworkAddress = flags.gatewayNetworkAddress as string
   const gatekeeperNetwork = BigInt(flags.gatekeeperNetwork as number)
 
   return {
     provider,
     gatewayTokenAddress,
+    gatewayNetworkAddress,
     gatekeeperNetwork,
     fees: flags.fees,
     gasLimit: flags.gasLimit,

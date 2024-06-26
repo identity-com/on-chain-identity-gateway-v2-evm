@@ -40,7 +40,7 @@ contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork, UUPSUpgr
         _gatewayGatekeeperStakingContractAddress = gatewayStakingContractAddress;
    }
    
-    function createNetwork(GatekeeperNetworkData calldata network) external override onlySuperAdmin {
+    function createNetwork(GatekeeperNetworkData calldata network) external override {
         bytes32 networkName = network.name;
 
         require(networkName != bytes32(0), "Network name cannot be an empty string");
