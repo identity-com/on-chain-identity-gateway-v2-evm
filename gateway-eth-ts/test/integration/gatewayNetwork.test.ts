@@ -1,7 +1,7 @@
 import * as dotenv from "dotenv";
 import * as assert from "assert";
 import { GatewayNetworkClass } from "../../src/service/GatewayNetwork";
-import { Wallet, ethers } from "ethers";
+import { Wallet, ethers, utils } from "ethers";
 import { BaseProvider } from "@ethersproject/providers";
 import { BNB_TESTNET_CONTRACT_ADDRESSES, ZERO_ADDRESS, gatekeeperOneTestnetWallet, gatekeeperTwoTestnetWallet, initTestNetwork, testNetworkName, testNetworkNameWithErc20Fees } from "../utils";
 import { GatewayNetwork, GatewayNetwork__factory } from "../../src/contracts/typechain-types";
@@ -45,11 +45,11 @@ describe("Gateway Network TS class", function () {
         }).timeout(5000);
 
         it("getNetworkId should return correct id for valid network", async function() {
-            assert.notEqual(await gatewayNetworkClient.getNetworkId(testNetworkName), 0);
+            assert.notEqual(await gatewayNetworkClient.getNetworkId(utils.parseBytes32String(testNetworkName)), 0);
         });
 
         it("doesNetworkExist should return true for valid network", async function() {
-            const networkId = await gatewayNetworkClient.getNetworkId(testNetworkName);
+            const networkId = await gatewayNetworkClient.getNetworkId(utils.parseBytes32String(testNetworkName));
             assert.equal(await gatewayNetworkClient.doesNetworkExist(networkId.toString()), true);
         });
 
@@ -96,7 +96,7 @@ describe("Gateway Network TS class", function () {
             const newDefaultTime = 1000;
             await gatewayNetworkClient.updatePassExpirationTimeConfig(testNetworkNameWithErc20Fees, newDefaultTime);
 
-            const networkId = await gatewayNetworkClient.getNetworkId(testNetworkNameWithErc20Fees);
+            const networkId = await gatewayNetworkClient.getNetworkId(utils.parseBytes32String(testNetworkNameWithErc20Fees));
             const network = await gatewayNetworkClient.getNetwork(networkId.toString());
 
             assert.equal(network.passExpireDurationInSeconds, newDefaultTime);
@@ -106,7 +106,7 @@ describe("Gateway Network TS class", function () {
             const newDescription = 'new description';
             await gatewayNetworkClient.updateDescription(newDescription,testNetworkNameWithErc20Fees);
 
-            const networkId = await gatewayNetworkClient.getNetworkId(testNetworkNameWithErc20Fees);
+            const networkId = await gatewayNetworkClient.getNetworkId(utils.parseBytes32String(testNetworkNameWithErc20Fees));
             const network = await gatewayNetworkClient.getNetwork(networkId.toString());
         }).timeout(15000);
 
@@ -116,7 +116,7 @@ describe("Gateway Network TS class", function () {
             const result = await gatewayNetworkClient.updateFees(testNetworkNameWithErc20Fees, newFees);
             result.wait();
 
-            const networkId = await gatewayNetworkClient.getNetworkId(testNetworkNameWithErc20Fees);
+            const networkId = await gatewayNetworkClient.getNetworkId(utils.parseBytes32String(testNetworkNameWithErc20Fees));
             const network = await gatewayNetworkClient.getNetwork(networkId.toString());
 
             assert.equal(network.networkFee.expireFee, newFees.expireFee);
@@ -129,7 +129,7 @@ describe("Gateway Network TS class", function () {
             const result = await gatewayNetworkClient.updateNetworkFeatures(testNetworkNameWithErc20Fees, 1);
             result.wait();
 
-            const networkId = await gatewayNetworkClient.getNetworkId(testNetworkNameWithErc20Fees);
+            const networkId = await gatewayNetworkClient.getNetworkId(utils.parseBytes32String(testNetworkNameWithErc20Fees));
             const network = await gatewayNetworkClient.getNetwork(networkId.toString());
             assert.equal(network.networkFeatureMask, 1);
         }).timeout(15000);
