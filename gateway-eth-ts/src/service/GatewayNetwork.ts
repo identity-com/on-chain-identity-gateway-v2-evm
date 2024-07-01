@@ -5,7 +5,7 @@ import {
   IGatewayGatekeeper,
   IGatewayNetwork
 } from "../contracts/typechain-types";
-import { BigNumberish, ContractTransaction, Wallet, ethers } from "ethers";
+import { BigNumberish, ContractTransaction, Wallet, ethers, utils } from "ethers";
 import { DEFAULT_GAS_LIMIT } from "../utils/constants";
 import { defaultAbiCoder } from "@ethersproject/abi";
 
@@ -36,6 +36,10 @@ export class GatewayNetworkClass {
       providerOrWallet
     );
     this.providerOrWallet = providerOrWallet;
+  }
+
+  async createNetwork(networkInfo: IGatewayNetwork.GatekeeperNetworkDataStruct): Promise<ContractTransaction> {
+    return await this.gatewayNetworkContract.createNetwork(networkInfo, { gasLimit: DEFAULT_GAS_LIMIT });
   }
 
   async withdrawNetworkFees(networkName: string): Promise<ContractTransaction> {
@@ -137,7 +141,7 @@ export class GatewayNetworkClass {
 
   async getNetworkId(networkName: string): Promise<BigNumberish> {
     return await this.gatewayNetworkContract.getNetworkId(
-      networkName,
+      utils.formatBytes32String(networkName),
       { gasLimit: DEFAULT_GAS_LIMIT }
     );
   }

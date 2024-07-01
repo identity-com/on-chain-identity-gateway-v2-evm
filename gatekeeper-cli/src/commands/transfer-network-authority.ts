@@ -1,3 +1,6 @@
+import {Args, Command, Flags} from '@oclif/core'
+
+import {makeGatewayNetworkTs} from '../utils/oclif/utils'
 import {
   confirmationsFlag,
   feesFlag, gatekeeperNetworkFlag,
@@ -6,15 +9,13 @@ import {
   privateKeyFlag, gasLimitFlag,
   gatewayNetworkAddressFlag,
 } from '../utils/oclif/flags'
-import {Args, Command, Flags} from '@oclif/core'
-import {makeGatewayNetworkTs} from '../utils/oclif/utils'
 import { utils } from 'ethers';
 
-export default class AddGatekeeper extends Command {
-  static description = 'Add a gatekeeper to a gatekeeper network';
+export default class TransferNetworkAuthority extends Command {
+  static description = 'Transfer network primary authority';
 
   static examples = [
-    `$ gateway-eth add-gatekeeper 0x893F4Be53274353CD3379C87C8fd1cb4f8458F94 -n 123
+    `$ gateway-eth add-network-authority 0x893F4Be53274353CD3379C87C8fd1cb4f8458F94 -n 123
 		`,
   ];
 
@@ -33,25 +34,28 @@ export default class AddGatekeeper extends Command {
   static args = {
     address: Args.string({name: 'address', required: true, description: 'Gatekeeper address to add to the gatekeeper network'}),
     networkName: Args.string({name: 'networkName', required: true, description: 'Name of the network'})
-  }
-
+  };
+  
   async run(): Promise<void> {
-    const {args, flags} = await this.parse(AddGatekeeper)
+    const {args, flags} = await this.parse(TransferNetworkAuthority)
 
-    const gatekeeper: string = args.address as string
+    const confirmations = flags.confirmations
+
+    const authority = args.address
+    const networkName = utils.formatBytes32String(args.networkName);
     const parsedFlags = parseFlagsWithPrivateKey(flags)
 
     this.log(`Adding:
-			gatekeeper ${gatekeeper}
-			to network ${args.networkName}`)
+			authority ${authority}
+			to network ${parsedFlags.gatekeeperNetwork}`)
 
     const gatewayNetwork = await makeGatewayNetworkTs(parsedFlags)
-    const sendableTransaction = await gatewayNetwork.addGatekeeper(utils.formatBytes32String(args.networkName), gatekeeper)
+    const sendableTransaction = await gatewayNetwork.updatePrimaryAuthority(networkName, authority);
 
-    const receipt = await sendableTransaction.wait(flags.confirmations)
+    const receipt = await sendableTransaction.wait(confirmations)
 
     this.log(
-      `Added gatekeeper to Gateway Token contract. TxHash: ${receipt.transactionHash}`,
+      `Transferring network authority to Gateway Token contract. TxHash: ${receipt.transactionHash}`,
     )
   }
 }
