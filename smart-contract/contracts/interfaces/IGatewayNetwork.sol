@@ -74,6 +74,7 @@ abstract contract  IGatewayNetwork {
     function withdrawNetworkFees(bytes32 networkName) external payable virtual;
     function closeNetwork(bytes32 networkName) external virtual;
     function updatePassExpirationTime(uint newExpirationTimeInSeconds, bytes32 networkName) external virtual;
+    function addGatekeepers(address[] memory gatekeeper, bytes32 network) external virtual;
     function addGatekeeper(address gatekeeper, bytes32 network) external virtual;
     function removeGatekeeper(address gatekeeper, bytes32 network) external virtual;
     function updatePrimaryAuthority(address newPrimaryAuthortiy, bytes32 networkName) external virtual;
