@@ -176,6 +176,26 @@ describe('GatewayNetwork', () => {
             expect(newGatekeepers.length).to.be.eq(1);
             expect(newGatekeepers[0]).to.be.eq(bob.address);
         });
+
+        it.skip('can add multiple gatekeepers if called by primary authority', async () => {
+            // given
+            const newGatekeeper = networkFeePayer.address;
+            const newGatekeeperTwo = alice.address;
+
+            const currentGatekeepers = await gatekeeperNetworkContract.getGatekeepersOnNetwork(defaultNetwork.name);
+            expect(currentGatekeepers.length).to.be.eq(0);
+
+            //when
+            await gatekeeperNetworkContract.connect(primaryAuthority).addGatekeepers([newGatekeeper, newGatekeeperTwo], defaultNetwork.name, {gasLimit: 300000});
+
+            //then
+            const newGatekeepers = await gatekeeperNetworkContract.getGatekeepersOnNetwork(defaultNetwork.name);
+
+            expect(newGatekeepers.length).to.be.eq(1);
+            expect(newGatekeepers[0]).to.be.eq(bob.address);
+            expect(newGatekeepers[1]).to.be.eq(networkFeePayer.address);
+        });
+
         it('can add a gatekeeper that does have the minimum amount of global stake', async () => {
             // given
             const newGatekeeper = bob.address;

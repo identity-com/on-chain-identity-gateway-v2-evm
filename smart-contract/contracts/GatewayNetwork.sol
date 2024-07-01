@@ -53,8 +53,7 @@ contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork, UUPSUpgr
         _networks[networkName] = network;
         _networks[networkName].lastFeeUpdateTimestamp = block.timestamp;
          // reset gatekeeper list so that primary authority can add gatekeepers manually
-         // The creator os the network probably won't be the primary authority of the network so they can't initialize gatekeepers
-        _networks[networkName].gatekeepers = new address[](20);
+        _networks[networkName].gatekeepers = new address[](0);
 
 
         emit GatekeeperNetworkCreated(network.primaryAuthority, networkName, network.passExpireDurationInSeconds);
@@ -116,7 +115,7 @@ contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork, UUPSUpgr
         emit GatekeeperNetworkDeleted(networkName);
     }
 
-    function addGatekeepers(address[] memory gatekeepers, bytes32 networkName) external override {
+    function addGatekeepers(address[] memory gatekeepers, bytes32 networkName) external override onlyPrimaryNetworkAuthority(networkName){
         for(uint i = 0; i < gatekeepers.length; i++) {
             this.addGatekeeper(gatekeepers[i], networkName);
         }
