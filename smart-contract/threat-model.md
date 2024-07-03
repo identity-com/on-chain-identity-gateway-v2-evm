@@ -41,6 +41,8 @@
 
 - `FlexibleNonceForwarder()::execute()`: Allows for meta-transactions to be executed on gateway token operations
 
+- `Gated::gated()`: Modifier that allows contracts to gate users based on gateway tokens for a given network
+
 # Key Invariants
 
 - A gateway token should only be valid on the gateway network it was issued on
