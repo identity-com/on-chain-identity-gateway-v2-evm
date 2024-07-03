@@ -39,6 +39,8 @@
 
 - `GatewayNetwork::withdrawNetworkFees()`: Allows the primary authority of the network to withdraw the network fees paid on the network
 
+- `FlexibleNonceForwarder()::execute()`: Allows for meta-transactions to be executed on gateway token operations
+
 # Key Invariants
 
 - A gateway token should only be valid on the gateway network it was issued on
