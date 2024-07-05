@@ -49,6 +49,18 @@ export const gatewayNetworkAddressFlag = Flags.custom<string>({
   description: 'GatewayNetwork address to target (or set GATEWAY_NETWORK_ADDRESS environment variable)',
 })
 
+export const gatekeeperContractAddressFlag = Flags.custom<string>({
+  char: 'a',
+  name: 'gateway-keeper-contract-address',
+  env: 'GATEWAY_GATEKEEPER_CONTRACT_ADDRESS',
+  parse: async (input: string) => {
+    if (!isAddress(input)) throw new Error('Invalid Gateway Gatekeeper contract address')
+    return input
+  },
+  required: false,
+  description: 'GatewayGatekeeper contract address to target (or set GATEWAY_GATEKEEPER_CONTRACT_ADDRESS environment variable)',
+})
+
 export const chainFlag = Flags.custom<BaseProvider>({
   char: 'c',
   name: 'chain',
@@ -104,6 +116,7 @@ type Flags = {
   gatewayTokenAddress: string | undefined
   gatewayNetworkAddress: string | undefined
   gatekeeperNetwork: number | undefined
+  gatekeeperContractAddress?: string | undefined
   fees?: GasPriceKey | undefined
   gasLimit?: BigNumber | undefined
   readOnly?: boolean | undefined
@@ -113,6 +126,7 @@ export const parseFlags = (flags: Flags) => {
   const provider = flags.chain as Provider
   const gatewayTokenAddress = flags.gatewayTokenAddress as string
   const gatewayNetworkAddress = flags.gatewayNetworkAddress as string
+  const gatekeeperContractAddress = flags.gatekeeperContractAddress ? flags.gatekeeperContractAddress as string : undefined
   const gatekeeperNetwork = BigInt(flags.gatekeeperNetwork as number)
 
   return {
@@ -123,6 +137,7 @@ export const parseFlags = (flags: Flags) => {
     fees: flags.fees,
     gasLimit: flags.gasLimit,
     readOnly: false,
+    gatekeeperContractAddress
   }
 }
 
