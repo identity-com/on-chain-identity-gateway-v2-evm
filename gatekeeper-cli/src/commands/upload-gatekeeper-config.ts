@@ -14,7 +14,7 @@ import {
     static description = 'Uploads issuer.config file to the associated did';
   
     static examples = [
-      `$ gateway-eth add-gatekeeper 0x893F4Be53274353CD3379C87C8fd1cb4f8458F94 -n 123
+      `$ gateway-eth upload-gatekeeper-config 0x893F4Be53274353CD3379C87C8fd1cb4f8458F94 -n 123
           `,
     ];
   

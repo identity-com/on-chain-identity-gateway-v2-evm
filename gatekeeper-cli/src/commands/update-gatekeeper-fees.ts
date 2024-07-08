@@ -5,6 +5,7 @@ import {
     chainFlag, parseFlagsWithPrivateKey,
     privateKeyFlag, gasLimitFlag,
     gatewayNetworkAddressFlag,
+    gatekeeperContractAddressFlag,
   } from '../utils/oclif/flags'
   import {Args, Command, Flags} from '@oclif/core'
   import {makeGatekeeperTs} from '../utils/oclif/utils'
@@ -24,6 +25,7 @@ import {
       gatewayTokenAddress: gatewayTokenAddressFlag(),
       gatekeeperNetwork: gatekeeperNetworkFlag(),
       gatewayNetworkAddress: gatewayNetworkAddressFlag(),
+      gatekeeperContractAddress: gatekeeperContractAddressFlag(),
       chain: chainFlag(),
       fees: feesFlag(),
       gasLimit: gasLimitFlag(),
@@ -44,10 +46,9 @@ import {
       const parsedFlags = parseFlagsWithPrivateKey(flags)
   
 
-  
       const gatewayGatekeeperClient = await makeGatekeeperTs(parsedFlags.provider, parsedFlags.privateKey, parsedFlags.gatekeeperContractAddress as string)
       const sendableTransaction = await gatewayGatekeeperClient.updateFeeConfig({issueFee: args.issueFee, expireFee: args.expireFee, freezeFee: args.freezeFee, refreshFee: args.refreshFee}, utils.formatBytes32String(args.networkName))
-  
+      this.log(`Confirmation is: ${flags.confirmations}`)
       const receipt = await sendableTransaction.wait(flags.confirmations)
   
       this.log(
