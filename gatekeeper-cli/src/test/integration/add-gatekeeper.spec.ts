@@ -2,7 +2,7 @@ import { BaseProvider } from "@ethersproject/providers";
 import * as dotenv from "dotenv";
 import { ethers, utils, Wallet } from "ethers";
 import {runCommand} from '@oclif/test'
-import { BNB_TESTNET_CONTRACT_ADDRESSES, createRandomString, FOUNDRY_DEFAULT_WALLET_ONE, GatewayNetworkClient } from "../../utils";
+import { BNB_TESTNET_CONTRACT_ADDRESSES, createRandomString, FOUNDRY_DEFAULT_WALLET_ONE, FOUNDRY_DEFAULT_WALLET_TWO, GatewayNetworkClient, RANDOM_NETWORK_NAME, RANDOM_WALLET } from "../../utils";
 import assert = require('assert');
 import { GatewayNetworkClass } from "@identity.com/gateway-evm-ts-client/dist/service/GatewayNetwork";
 
@@ -19,12 +19,12 @@ describe("Command: Add gatekeeper to network", function () {
         provider = new ethers.providers.JsonRpcProvider("http://127.0.0.1:8545"); // Test run against local node forked
 
         testWallet = FOUNDRY_DEFAULT_WALLET_ONE.connect(provider);
-        gatekeeper = Wallet.createRandom();
+        gatekeeper = FOUNDRY_DEFAULT_WALLET_TWO.connect(provider);
         networkClient = GatewayNetworkClient(testWallet, BNB_TESTNET_CONTRACT_ADDRESSES.gatewayNetwork)
     });
 
     it("add a new gatekeeper to a network", async function () {
-        const networkName = createRandomString(8)
+        const networkName = RANDOM_NETWORK_NAME;
         await runCommand([
             "create-gatekeeper-network", 
             networkName,

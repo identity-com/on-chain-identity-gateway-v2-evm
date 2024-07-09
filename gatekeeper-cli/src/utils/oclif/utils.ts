@@ -1,9 +1,10 @@
 import {Provider} from '@ethersproject/providers'
 import {getSigner} from './signer'
-import { GatewayTs, TokenData, GatewayNetwork } from "@identity.com/gateway-evm-ts-client";
+import { GatewayTs, TokenData, GatewayNetwork, GatewayGatekeeper } from "@identity.com/gateway-evm-ts-client";
 import {BigNumber} from '@ethersproject/bignumber'
 import {estimateGasPrice, GasPriceKey} from './gas'
 import { getAddress } from '@ethersproject/address';
+import { DidRegistry } from "@identity.com/did-bnb-client";
 
 export const makeGatewayTs = async ({
   provider,
@@ -32,6 +33,22 @@ export const makeGatewayNetworkTs = async ({
   const providerOrWallet = readOnly ? provider : signer || provider
   return new GatewayNetwork(providerOrWallet, getAddress(gatewayNetworkAddress))
 }
+
+export const makeGatekeeperTs = async (provider: Provider, privateKey: string, gatekeeperContractAddress: string):Promise<GatewayGatekeeper> => {
+  const signer = privateKey ? getSigner(privateKey, provider) : undefined
+  const providerOrWallet = signer || provider
+  return new GatewayGatekeeper(providerOrWallet, getAddress(gatekeeperContractAddress))
+}
+
+export const makeDidRegistryClient = async(didRegistryContractAddress: string, privateKey: string, provider: Provider): Promise<DidRegistry> => {
+  const signer = privateKey ? getSigner(privateKey, provider) : undefined
+  const providerOrWallet = signer || provider
+
+  // Need to parse chainEnv to figure out mainnet vs testnet
+  return new DidRegistry(providerOrWallet, didRegistryContractAddress, { chainEnvironment: "testnet", gasLimit: 500000});
+}
+
+
 
 export const checkedGetToken = async (
   gateway: GatewayTs,
