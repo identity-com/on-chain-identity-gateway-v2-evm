@@ -10,7 +10,7 @@ import {
   import {makeGatewayNetworkTs, makeGatewayTs} from '../utils/oclif/utils'
   import { utils, Wallet } from 'ethers';
   
-  export default class IssueToken extends Command {
+  export default class RefreshToken extends Command {
     static description = 'Gatekeepers can issue tokens on their respective networks';
   
     static examples = [
@@ -40,7 +40,7 @@ import {
     }
   
     async run(): Promise<void> {
-      const {args, flags} = await this.parse(IssueToken)
+      const {args, flags} = await this.parse(RefreshToken)
   
       const tokenOwner: string = args.tokenOwner
       const parsedFlags = parseFlagsWithPrivateKey(flags)
@@ -51,12 +51,11 @@ import {
 
       const networkId = await gatewayNetwork.getNetworkId(utils.formatBytes32String(args.networkName));
       const feeRecipient = (new Wallet(parsedFlags.privateKey)).address
-      const sendableTransaction = await gatewayTokenTs.issue(
+      const sendableTransaction = await gatewayTokenTs.refresh(
           tokenOwner,
           networkId.valueOf() as bigint,
-          args.expirationTimeInSeconds,
-          0,
           {feeRecipient , feeSender: args.feeSender},
+          args.expirationTimeInSeconds,
           {
               tokenSender: args.feeSender,
               recipient: feeRecipient
@@ -66,7 +65,7 @@ import {
       const receipt = await sendableTransaction.wait(flags.confirmations)
   
       this.log(
-        `Issued gateway token to use. TxHash: ${receipt.transactionHash}`,
+        `Refreshed gateway token. TxHash: ${receipt.transactionHash}`,
       )
     }
   }
