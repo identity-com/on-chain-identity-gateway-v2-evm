@@ -44,13 +44,18 @@ import {
   
       const tokenOwner: string = args.tokenOwner
       const parsedFlags = parseFlagsWithPrivateKey(flags)
+
+      this.log(`Issuing token for address: ${tokenOwner} on network ${args.networkName}`)
+
   
   
       const gatewayNetwork = await makeGatewayNetworkTs(parsedFlags)
       const gatewayTokenTs = await makeGatewayTs(parsedFlags)
 
-      const networkId = await gatewayNetwork.getNetworkId(utils.formatBytes32String(args.networkName));
+      const networkId = await gatewayNetwork.getNetworkId(args.networkName);
       const feeRecipient = (new Wallet(parsedFlags.privateKey)).address
+
+      this.log(`Issuing token for address: ${tokenOwner} on network ${args.networkName}`)
       const sendableTransaction = await gatewayTokenTs.issue(
           tokenOwner,
           networkId.valueOf() as bigint,
