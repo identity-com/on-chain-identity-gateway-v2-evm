@@ -47,11 +47,11 @@ import {
       const gatewayTokenTs = await makeGatewayTs(parsedFlags)
 
       const networkId = await gatewayNetwork.getNetworkId(utils.formatBytes32String(args.networkName));
-      const tokenId = await gatewayTokenTs.getTokenId(tokenOwner, networkId.valueOf() as bigint, args.onlyActive);
+      const tokenData = await gatewayTokenTs.getFirstTokenOnNetwork(tokenOwner, networkId.valueOf() as bigint, args.onlyActive);
   
   
       this.log(
-        `Fetched token id ${tokenId}`
+        `Fetched token  ${JSON.stringify(tokenData)}`
       )
     }
   }
