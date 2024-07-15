@@ -7,8 +7,8 @@ import {
     gatewayNetworkAddressFlag,
   } from '../utils/oclif/flags'
   import {Args, Command, Flags} from '@oclif/core'
-  import {makeDidRegistryClient, makeGatekeeperTs, makeGatewayNetworkTs, makeGatewayTs} from '../utils/oclif/utils'
-  import { BigNumber, utils } from 'ethers';
+  import {makeGatewayNetworkTs, makeGatewayTs} from '../utils/oclif/utils'
+  import { utils } from 'ethers';
   
   export default class VerifyAddress extends Command {
     static description = 'Checks if the given address has a valid gateway token on the given network';
@@ -43,7 +43,7 @@ import {
     
       const gatewayTokenTs = await makeGatewayTs(parsedFlags)
       const gatewayNetwork = await makeGatewayNetworkTs(parsedFlags)
-      const networkId = await gatewayNetwork.getNetworkId(utils.formatBytes32String(args.networkName));
+      const networkId = await gatewayNetwork.getNetworkId(args.networkName);
 
       const hasValidToken = await gatewayTokenTs.verify(args.address, networkId.valueOf() as bigint);
   

@@ -49,7 +49,7 @@ import {
       const gatewayNetwork = await makeGatewayNetworkTs(parsedFlags)
       const gatewayTokenTs = await makeGatewayTs(parsedFlags)
 
-      const networkId = await gatewayNetwork.getNetworkId(utils.formatBytes32String(args.networkName));
+      const networkId = await gatewayNetwork.getNetworkId(args.networkName);
       const feeRecipient = (new Wallet(parsedFlags.privateKey)).address
       const sendableTransaction = await gatewayTokenTs.refresh(
           tokenOwner,

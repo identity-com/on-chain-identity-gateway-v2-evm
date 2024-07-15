@@ -45,7 +45,7 @@ import {
       const gatewayNetwork = await makeGatewayNetworkTs(parsedFlags)
       const gatewayTokenTs = await makeGatewayTs(parsedFlags)
 
-      const networkId = await gatewayNetwork.getNetworkId(utils.formatBytes32String(args.networkName));
+      const networkId = await gatewayNetwork.getNetworkId(args.networkName);
       const sendableTransaction = await gatewayTokenTs.freeze(tokenOwner, networkId.valueOf() as bigint)
   
       const receipt = await sendableTransaction.wait(flags.confirmations)
