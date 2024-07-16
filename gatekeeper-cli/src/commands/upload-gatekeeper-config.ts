@@ -44,9 +44,9 @@ import {
       const didRegistry = await makeDidRegistryClient(args.didRegistryContractAddress, parsedFlags.privateKey, parsedFlags.provider);
 
       // Check is did already initialized
-      const isDidInitialized = didRegistry.isGenerativeDidState(didRegistry.getDid())
+      const isDidGenerative = await didRegistry.isGenerativeDidState(didRegistry.getDid())
 
-      if(!isDidInitialized) {
+      if(isDidGenerative) {
         this.log(` Initializing did state`)
         const initilizeTx = await didRegistry.initializeDidState();
         const initilizeReceipt = await initilizeTx.wait(flags.confirmations);

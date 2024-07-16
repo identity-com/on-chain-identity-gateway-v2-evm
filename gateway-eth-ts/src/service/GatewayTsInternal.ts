@@ -135,7 +135,7 @@ export class GatewayTsInternal<
     network: bigint,
     partiesInCharge: ChargeParties,
     expiry?: number | BigNumber,
-    chargeType?: Charge
+    chargeType?: Partial<Charge>
   ): Promise<O> {
     const tokenId = await this.getTokenId(owner, network);
     const expirationTime = getExpirationTime(expiry);
