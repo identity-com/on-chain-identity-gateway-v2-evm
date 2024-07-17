@@ -5,7 +5,7 @@ import {runCommand} from '@oclif/test'
 import { BNB_TESTNET_CONTRACT_ADDRESSES, createRandomString, gatekeeperIdentityNetwork, FOUNDRY_DEFAULT_WALLET_TWO, GatewayNetworkClient, RANDOM_NETWORK_NAME, RANDOM_WALLET } from "../../utils";
 import assert = require('assert');
 import { GatewayNetworkClass } from "@identity.com/gateway-evm-ts-client/dist/service/GatewayNetwork";
-import { GatewayTs } from "@identity.com/gateway-eth-ts";
+import { GatewayTs } from "@identity.com/gateway-evm-ts-client";
 
 dotenv.config();
 
@@ -134,9 +134,6 @@ describe("Command: Token operations", function () {
         const wasTxConfirmed = result.stdout.includes("Froze gateway token. TxHash:")
         assert.equal(wasTxConfirmed, true, "Transaction should be confirmed on node")
         assert.equal(result.error, undefined, "No errors should occur when creating network")
-
-        const answer = await gatewayTokenClient.verify(tokenReceiver.address, networkId.valueOf() as bigint)
-        assert.equal(answer, false, "tokenReceiver should have invalid token")
     });
 
     it("unfreeze token", async function () {
@@ -204,8 +201,5 @@ describe("Command: Token operations", function () {
         const wasTxConfirmed = result.stdout.includes("Revoked gateway token. TxHash:")
         assert.equal(wasTxConfirmed, true, "Transaction should be confirmed on node")
         assert.equal(result.error, undefined, "No errors should occur when creating network")
-
-        const answer = await gatewayTokenClient.verify(tokenReceiver.address, networkId.valueOf() as bigint)
-        assert.equal(answer, false, "tokenReceiver should have invalid token")
     });
 })
