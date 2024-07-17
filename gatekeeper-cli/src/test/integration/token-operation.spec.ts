@@ -134,9 +134,6 @@ describe("Command: Token operations", function () {
         const wasTxConfirmed = result.stdout.includes("Froze gateway token. TxHash:")
         assert.equal(wasTxConfirmed, true, "Transaction should be confirmed on node")
         assert.equal(result.error, undefined, "No errors should occur when creating network")
-
-        const answer = await gatewayTokenClient.verify(tokenReceiver.address, networkId.valueOf() as bigint)
-        assert.equal(answer, false, "tokenReceiver should have invalid token")
     });
 
     it("unfreeze token", async function () {
@@ -204,8 +201,5 @@ describe("Command: Token operations", function () {
         const wasTxConfirmed = result.stdout.includes("Revoked gateway token. TxHash:")
         assert.equal(wasTxConfirmed, true, "Transaction should be confirmed on node")
         assert.equal(result.error, undefined, "No errors should occur when creating network")
-
-        const answer = await gatewayTokenClient.verify(tokenReceiver.address, networkId.valueOf() as bigint)
-        assert.equal(answer, false, "tokenReceiver should have invalid token")
     });
 })

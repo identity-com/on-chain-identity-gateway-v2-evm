@@ -47,11 +47,11 @@ import {
       const isDidGenerative = await didRegistry.isGenerativeDidState(didRegistry.getDid())
 
       if(isDidGenerative) {
-        this.log(` Initializing did state`)
+        this.log(` Initializing did state \n`)
         const initilizeTx = await didRegistry.initializeDidState();
         const initilizeReceipt = await initilizeTx.wait(flags.confirmations);
 
-        this.log(`Initialized did. TxHash: ${initilizeReceipt.transactionHash}`)
+        this.log(`Initialized did. TxHash: ${initilizeReceipt.transactionHash} \n`)
       }
   
       const sendableTransaction = await didRegistry.addService({
