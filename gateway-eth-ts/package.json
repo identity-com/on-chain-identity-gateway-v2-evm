@@ -1,6 +1,6 @@
 {
   "name": "@identity.com/gateway-evm-ts-client",
-  "version": "0.1.1",
+  "version": "0.1.4",
   "description": "Adapter library for Identity.com gateway token system on Ethereum",
   "main": "dist/index.js",
   "scripts": {
@@ -14,10 +14,10 @@
     "stop-network": "lsof -t -i:8545 | xargs kill",
     "copy-contracts": "cp -r ../smart-contract/build/contracts/* src/contracts/abi/ && cp -r ../smart-contract/typechain-types src/contracts"
   },
-  "repository": "git@github.com:identity-com/on-chain-identity-gateway.git",
-  "author": "Daniel Kelleher",
+  "repository": "git@github.com:identity-com/gateway-protocol-evm.git",
+  "author": "Robert Leonard",
   "license": "MIT",
-  "bugs": "https://github.com/identity-com/on-chain-identity-gateway/issues",
+  "bugs": "https://github.com/identity-com/gateway-protocol-evm/issues",
   "files": [
     "/dist",
     "/npm-shrinkwrap.json"
