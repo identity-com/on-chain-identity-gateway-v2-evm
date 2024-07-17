@@ -5,7 +5,7 @@ import {runCommand} from '@oclif/test'
 import { BNB_TESTNET_CONTRACT_ADDRESSES, createRandomString, gatekeeperIdentityNetwork, FOUNDRY_DEFAULT_WALLET_TWO, GatewayNetworkClient, RANDOM_NETWORK_NAME, RANDOM_WALLET } from "../../utils";
 import assert = require('assert');
 import { GatewayNetworkClass } from "@identity.com/gateway-evm-ts-client/dist/service/GatewayNetwork";
-import { GatewayTs } from "@identity.com/gateway-eth-ts";
+import { GatewayTs } from "@identity.com/gateway-evm-ts-client";
 
 dotenv.config();
 

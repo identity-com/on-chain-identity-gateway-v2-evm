@@ -4,8 +4,8 @@ import {BaseProvider, Provider} from '@ethersproject/providers'
 import {GasPriceKey} from './gas'
 import {getProvider, networks} from './providers'
 import {isAddress} from '@ethersproject/address'
-import {DEFAULT_GATEWAY_TOKEN_ADDRESS} from '@identity.com/gateway-eth-ts'
 import {BigNumber} from '@ethersproject/bignumber'
+import { BNB_TESTNET_CONTRACT_ADDRESSES } from '..'
 
 // PRIVATE KEY FOR TEST, DEMO ONLY
 // DO NOT USE THIS IN PRODUCTION
@@ -33,7 +33,7 @@ export const gatewayTokenAddressFlag = Flags.custom<string>({
     if (!isAddress(input)) throw new Error('Invalid Gateway Token address')
     return input
   },
-  default: DEFAULT_GATEWAY_TOKEN_ADDRESS,
+  default: BNB_TESTNET_CONTRACT_ADDRESSES.gatewayToken,
   description: 'GatewayToken address to target (or set GATEWAY_TOKEN_ADDRESS environment variable)',
 })
 
