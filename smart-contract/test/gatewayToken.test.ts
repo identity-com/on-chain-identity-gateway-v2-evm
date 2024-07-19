@@ -689,6 +689,21 @@ describe('GatewayToken', async () => {
       // expect
       expect(expiration).to.equal(expectedExpiration);
     });
+
+    it('Fail to mint token due to expiration time being in the past', async () => {
+      // given
+      const dummyWallet = randomAddress();
+      const expectedExpiration = 1;
+
+      await gatewayNetwork.connect(identityCom).updatePassExpirationTime(0,utils.formatBytes32String('GKN-1'));
+
+      // when
+      await expect(gatewayToken.connect(gatekeeper).mint(dummyWallet, gkn1, expectedExpiration, 0, {
+        recipient: gatekeeper.address,
+        tokenSender: ZERO_ADDRESS,
+      })).to.be.rejectedWith("Expiration time must be in the future");
+
+    })
   });
 
   describe('Test Gated modifier', async () => {

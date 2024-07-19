@@ -208,6 +208,7 @@ contract GatewayToken is
         _checkGatekeeper(network);
         address gatekeeper = _msgSender();
 
+
         // EFFECTS
         uint tokenId = ERC3525Upgradeable._mint(to, network, 1);
         uint networkExpiration = block.timestamp + IGatewayNetwork(_gatewayNetworkContract).getNetwork(network).passExpireDurationInSeconds;
@@ -215,6 +216,7 @@ contract GatewayToken is
         if(networkExpiration > block.timestamp) {
             _expirations[tokenId] = networkExpiration;
         } else if (expiration > 0) {
+            require(expiration > block.timestamp, "Expiration time must be in the future");
             _expirations[tokenId] = expiration;
         }
 
