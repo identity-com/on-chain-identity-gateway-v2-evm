@@ -440,7 +440,7 @@ describe('GatewayNetwork', () => {
 
         it('can delete a network', async () => {
             //given
-            const existingNetwork = getDefaultNetwork(primaryAuthority.address);
+            const existingNetwork = defaultNetwork;
             const network = await gatekeeperNetworkContract._networks(existingNetwork.name);
             expect(network.name).to.equal(existingNetwork.name);
 
@@ -478,6 +478,21 @@ describe('GatewayNetwork', () => {
             //when
 
             await expect(gatekeeperNetworkContract.connect(primaryAuthority).closeNetwork(defaultNetwork.name)).to.be.revertedWith("Network has fees that need to be withdrawn");
+        });
+
+        it.only('delete a network with a next primary authority', async () => {
+            // given
+            const newPrimaryAuthority = bob.address;
+
+            // Add updated primary authority
+            await gatekeeperNetworkContract.connect(primaryAuthority).updatePrimaryAuthority(newPrimaryAuthority, defaultNetwork.name, {gasLimit: 300000})
+
+            //when
+            await gatekeeperNetworkContract.connect(primaryAuthority).closeNetwork(defaultNetwork.name);
+
+            //then
+            const resolvedNetwork = await gatekeeperNetworkContract._networks(defaultNetwork.name);
+            expect(resolvedNetwork.primaryAuthority).to.equal(ZERO_ADDRESS);
         });
     });
 

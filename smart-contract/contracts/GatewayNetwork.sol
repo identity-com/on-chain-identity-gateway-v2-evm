@@ -111,6 +111,7 @@ contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork, UUPSUpgr
         require(networkFeeBalances[networkName] == 0, "Network has fees that need to be withdrawn");
 
         delete _networks[networkName];
+        delete _nextPrimaryAuthoritys[networkName];
 
         emit GatekeeperNetworkDeleted(networkName);
     }
