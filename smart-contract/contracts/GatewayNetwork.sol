@@ -29,6 +29,13 @@ contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork, UUPSUpgr
         _;
     }
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    // empty constructor in line with the UUPS upgradeable proxy pattern
+    // solhint-disable-next-line no-empty-blocks
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(address owner, address gatewayGatekeeperContractAddress, address gatewayStakingContractAddress) initializer public {
         _superAdmins[owner] = true;
 
@@ -49,6 +56,12 @@ contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork, UUPSUpgr
         if(_networks[networkName].primaryAuthority != address(0)) {
             revert GatewayNetworkAlreadyExists(string(abi.encodePacked(networkName)));
         }
+
+        // Check fees
+        require(network.networkFee.issueFee <= MAX_FEE_BPS, "Issue fee must be below 100%");
+        require(network.networkFee.refreshFee <= MAX_FEE_BPS, "Refresh fee must be below 100%");
+        require(network.networkFee.expireFee <= MAX_FEE_BPS, "Expiration fee must be below 100%");
+        require(network.networkFee.freezeFee <= MAX_FEE_BPS, "Freeze fee must be below 100%");
         
         _networks[networkName] = network;
         _networks[networkName].lastFeeUpdateTimestamp = block.timestamp;
@@ -111,6 +124,7 @@ contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork, UUPSUpgr
         require(networkFeeBalances[networkName] == 0, "Network has fees that need to be withdrawn");
 
         delete _networks[networkName];
+        delete _nextPrimaryAuthoritys[networkName];
 
         emit GatekeeperNetworkDeleted(networkName);
     }

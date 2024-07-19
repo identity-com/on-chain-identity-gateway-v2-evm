@@ -16,6 +16,13 @@ contract Gatekeeper is ParameterizedAccessControl, IGatewayGatekeeper, UUPSUpgra
         _;
     }
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    // empty constructor in line with the UUPS upgradeable proxy pattern
+    // solhint-disable-next-line no-empty-blocks
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(address owner) initializer public {
       // Contract deployer is the initial super admin
       _superAdmins[owner] = true;
