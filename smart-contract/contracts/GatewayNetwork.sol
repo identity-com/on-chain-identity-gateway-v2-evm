@@ -29,6 +29,13 @@ contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork, UUPSUpgr
         _;
     }
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    // empty constructor in line with the UUPS upgradeable proxy pattern
+    // solhint-disable-next-line no-empty-blocks
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(address owner, address gatewayGatekeeperContractAddress, address gatewayStakingContractAddress) initializer public {
         _superAdmins[owner] = true;
 

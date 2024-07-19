@@ -480,7 +480,7 @@ describe('GatewayNetwork', () => {
             await expect(gatekeeperNetworkContract.connect(primaryAuthority).closeNetwork(defaultNetwork.name)).to.be.revertedWith("Network has fees that need to be withdrawn");
         });
 
-        it.only('delete a network with a next primary authority', async () => {
+        it('delete a network with a next primary authority', async () => {
             // given
             const newPrimaryAuthority = bob.address;
 
