@@ -56,6 +56,12 @@ contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork, UUPSUpgr
         if(_networks[networkName].primaryAuthority != address(0)) {
             revert GatewayNetworkAlreadyExists(string(abi.encodePacked(networkName)));
         }
+
+        // Check fees
+        require(network.networkFee.issueFee <= MAX_FEE_BPS, "Issue fee must be below 100%");
+        require(network.networkFee.refreshFee <= MAX_FEE_BPS, "Refresh fee must be below 100%");
+        require(network.networkFee.expireFee <= MAX_FEE_BPS, "Expiration fee must be below 100%");
+        require(network.networkFee.freezeFee <= MAX_FEE_BPS, "Freeze fee must be below 100%");
         
         _networks[networkName] = network;
         _networks[networkName].lastFeeUpdateTimestamp = block.timestamp;

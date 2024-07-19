@@ -128,6 +128,18 @@ describe('GatewayNetwork', () => {
 
             await expect(gatekeeperNetworkContract.connect(deployer).createNetwork(defaultNetwork, {gasLimit: 300000})).to.be.revertedWithCustomError(gatekeeperNetworkContract, 'GatewayNetworkAlreadyExists');
         });
+        it('cannot create a new network with invalid fees', async () => {
+            const defaultNetwork = getDefaultNetwork(primaryAuthority.address, []);
+            defaultNetwork.networkFee = {
+                issueFee: 10001,
+                refreshFee: 100,
+                expireFee: 100,
+                freezeFee: 100
+            }
+            defaultNetwork.name = utils.formatBytes32String('test');
+
+            await expect(gatekeeperNetworkContract.connect(deployer).createNetwork(defaultNetwork, {gasLimit: 300000})).to.be.rejectedWith('Issue fee must be below 100%');
+        });
     })
 
     describe('Gatekeeper Network Update', async () => {
