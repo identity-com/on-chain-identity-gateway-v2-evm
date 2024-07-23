@@ -82,7 +82,7 @@ export const useGatewayPortal = (props: GatewayPortalProps) => {
 
             // Call network contract to fetch network data
 
-            const networkId = await networkClient.getNetworkId(networkNameInBytes);
+            const networkId = await networkClient.getNetworkId(networkName);
             const networkResponse = await networkClient.getNetwork(networkId.toString());
 
             // Verify if userAddress has a valid pass
@@ -100,7 +100,7 @@ export const useGatewayPortal = (props: GatewayPortalProps) => {
                     hasValidPass: hasValidToken,
                     networkInfo: {
                         name: networkNameInBytes,
-                        description: "This network can meet your KYC needs by ID verification and verifying liveliness",
+                        description: utils.toUtf8String(await networkResponse.description),
                         feeToken: feeTokenAddress == ZERO_ADDRESS ? "BNB" : feeTokenAddress
                     },
                     validPassData: {
@@ -122,7 +122,7 @@ export const useGatewayPortal = (props: GatewayPortalProps) => {
                     hasValidPass: hasValidToken,
                     networkInfo: {
                         name: networkNameInBytes,
-                        description: "This network can meet your KYC needs by ID verification and verifying liveliness",
+                        description: utils.toUtf8String(await networkResponse.description),
                         feeToken: feeTokenAddress == ZERO_ADDRESS ? "BNB" : feeTokenAddress
                     },
                     invalidPassData: {
