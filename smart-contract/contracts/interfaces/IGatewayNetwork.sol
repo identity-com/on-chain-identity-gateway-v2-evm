@@ -75,7 +75,7 @@ abstract contract  IGatewayNetwork {
     function closeNetwork(bytes32 networkName) external virtual;
     function updatePassExpirationTime(uint newExpirationTimeInSeconds, bytes32 networkName) external virtual;
     function addGatekeepers(address[] memory gatekeeper, bytes32 network) external virtual;
-    function addGatekeeper(address gatekeeper, bytes32 network) external virtual;
+    function addGatekeeper(address gatekeeper, bytes32 network) public virtual;
     function removeGatekeeper(address gatekeeper, bytes32 network) external virtual;
     function updatePrimaryAuthority(address newPrimaryAuthortiy, bytes32 networkName) external virtual;
     function updateGatekeeperStatus(address gatekeeper, bytes32 networkName, IGatewayGatekeeper.GatekeeperStatus status) external virtual;

@@ -134,13 +134,7 @@ contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork, UUPSUpgr
         emit GatekeeperNetworkDeleted(networkName);
     }
 
-    function addGatekeepers(address[] memory gatekeepers, bytes32 networkName) external override onlyPrimaryNetworkAuthority(networkName){
-        for(uint i = 0; i < gatekeepers.length; i++) {
-            this.addGatekeeper(gatekeepers[i], networkName);
-        }
-    }
-
-    function addGatekeeper(address gatekeeper, bytes32 networkName) external override onlyPrimaryNetworkAuthority(networkName){
+    function addGatekeeper(address gatekeeper, bytes32 networkName) public override onlyPrimaryNetworkAuthority(networkName){
         require(_networks[networkName].primaryAuthority != address(0), "Network does not exist");
         require(gatekeeper != address(0), "Zero address cannot be added as a gatekeeper");
 
@@ -160,6 +154,12 @@ contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork, UUPSUpgr
 
         IGatewayGatekeeper(_gatewayGatekeeperContractAddress).initializeGatekeeperNetworkData(networkName, gatekeeper, IGatewayGatekeeper.GatekeeperStatus.ACTIVE);
         emit GatekeeperNetworkGatekeeperAdded(gatekeeper);
+    }
+
+    function addGatekeepers(address[] memory gatekeepers, bytes32 networkName) external override onlyPrimaryNetworkAuthority(networkName){
+        for(uint i = 0; i < gatekeepers.length; i++) {
+            addGatekeeper(gatekeepers[i], networkName);
+        }
     }
 
     function removeGatekeeper(address gatekeeper, bytes32 networkName) external override onlyPrimaryNetworkAuthority(networkName){

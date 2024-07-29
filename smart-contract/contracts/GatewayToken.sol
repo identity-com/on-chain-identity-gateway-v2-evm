@@ -275,6 +275,14 @@ contract GatewayToken is
         uint network = slotOf(tokenId);
         _checkGatekeeper(slotOf(tokenId));
 
+        uint networkDefaultExpiration = IGatewayNetwork(_gatewayNetworkContract).getNetwork(network).passExpireDurationInSeconds;
+        uint tokenExpiration = _expirations[tokenId];
+
+        // If network set a tokens expiration, it can not be updated until the networkExpiration expires
+        if (networkDefaultExpiration > 0) {
+            require(block.timestamp >= networkDefaultExpiration, "Network expiration must expire");
+        }
+
         address gatekeeper = _msgSender();
         // EFFECTS
         _setExpiration(tokenId, timestamp);

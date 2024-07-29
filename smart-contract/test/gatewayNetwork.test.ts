@@ -189,7 +189,7 @@ describe('GatewayNetwork', () => {
             expect(newGatekeepers[0]).to.be.eq(bob.address);
         });
 
-        it.skip('can add multiple gatekeepers if called by primary authority', async () => {
+        it('can add multiple gatekeepers if called by primary authority', async () => {
             // given
             const newGatekeeper = networkFeePayer.address;
             const newGatekeeperTwo = alice.address;
@@ -203,7 +203,7 @@ describe('GatewayNetwork', () => {
             //then
             const newGatekeepers = await gatekeeperNetworkContract.getGatekeepersOnNetwork(defaultNetwork.name);
 
-            expect(newGatekeepers.length).to.be.eq(1);
+            expect(newGatekeepers.length).to.be.eq(2);
             expect(newGatekeepers[0]).to.be.eq(bob.address);
             expect(newGatekeepers[1]).to.be.eq(networkFeePayer.address);
         });
