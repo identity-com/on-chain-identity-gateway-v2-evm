@@ -280,7 +280,7 @@ contract GatewayToken is
 
         // If network set a tokens expiration, it can not be updated until the networkExpiration expires
         if (networkDefaultExpiration > 0) {
-            require(block.timestamp >= networkDefaultExpiration, "Network expiration must expire");
+            require(block.timestamp >= tokenExpiration, "Network expiration must expire");
         }
 
         address gatekeeper = _msgSender();

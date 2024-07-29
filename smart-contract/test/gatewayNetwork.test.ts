@@ -204,8 +204,8 @@ describe('GatewayNetwork', () => {
             const newGatekeepers = await gatekeeperNetworkContract.getGatekeepersOnNetwork(defaultNetwork.name);
 
             expect(newGatekeepers.length).to.be.eq(2);
-            expect(newGatekeepers[0]).to.be.eq(bob.address);
-            expect(newGatekeepers[1]).to.be.eq(networkFeePayer.address);
+            expect(newGatekeepers[0]).to.be.eq(newGatekeeper);
+            expect(newGatekeepers[1]).to.be.eq(newGatekeeperTwo);
         });
 
         it('can add a gatekeeper that does have the minimum amount of global stake', async () => {

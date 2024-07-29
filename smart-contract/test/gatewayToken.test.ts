@@ -587,6 +587,8 @@ describe('GatewayToken', async () => {
     it('onlyActive should determine whether an expired token is returned or not', async () => {
       const aliceTokenIdsGKN1 = await gatewayToken.getTokenIdsByOwnerAndNetwork(alice.address, gkn1, true);
       const beforeExpiration = await gatewayToken.getExpiration(aliceTokenIdsGKN1[1]);
+
+      await gatewayNetwork.connect(identityCom).updatePassExpirationTime(0, utils.formatBytes32String('GKN-1'));
       await gatewayToken
         .connect(gatekeeper)
         .setExpiration(aliceTokenIdsGKN1[1], Date.parse('2020-01-01') / 1000, {
@@ -613,6 +615,8 @@ describe('GatewayToken', async () => {
         recipient: gatekeeper.address,
         tokenSender: ZERO_ADDRESS,
       });
+
+      await gatewayNetwork.connect(identityCom).updatePassExpirationTime(1000000, utils.formatBytes32String('GKN-1'));
     });
 
     it('Try to transfer a token, expect revert', async () => {
