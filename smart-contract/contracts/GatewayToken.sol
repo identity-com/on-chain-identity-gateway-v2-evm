@@ -324,9 +324,10 @@ contract GatewayToken is
     /**
      * @dev Triggered by external contract to verify the validity of the default token for `owner`.
      *
-     * Checks owner has any token on gateway token contract, `tokenId` still active, and not expired.
+     * Checks owner has any token on gateway token contract, `tokenId` still active, and not expired. Reverts if tokenId does not exist.
      */
     function verifyToken(uint tokenId) external virtual returns (bool) {
+        // Reverts if tokenId does not exist.
         bool doesExistAndIsActive = _existsAndActive(tokenId, false);
 
         return doesExistAndIsActive;
@@ -563,7 +564,7 @@ contract GatewayToken is
     }
 
     /**
-     * @dev Returns whether `tokenId` exists and not frozen.
+     * @dev Returns whether `tokenId` is not frozen. Reverts if tokenId does not exist.
      */
     function _existsAndActive(uint tokenId, bool allowExpired) internal view virtual returns (bool) {
         // check state before anything else. This reduces the overhead,
@@ -611,7 +612,9 @@ contract GatewayToken is
     /// @dev Checks if the token exists and is active. Optionally ignore expiry.
     /// Use this when you need to check if a token exists, and is not frozen or revoked
     /// But you don't care about its expiry, e.g. you are extending the expiry.
+    /// Reverts if tokenId does not exist.
     function _checkActiveToken(uint tokenId, bool allowExpired) internal view {
+        // Reverts if tokenId does not exist.
         if (!_existsAndActive(tokenId, allowExpired)) {
             revert GatewayToken__TokenDoesNotExistOrIsInactive(tokenId, allowExpired);
         }
