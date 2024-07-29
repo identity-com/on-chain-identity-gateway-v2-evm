@@ -435,7 +435,7 @@ contract GatewayToken is
      */
     function _setExpiration(uint tokenId, uint timestamp) internal virtual {
         _checkActiveToken(tokenId, true);
-
+        
         _expirations[tokenId] = timestamp;
         emit Expiration(tokenId, timestamp);
     }
