@@ -9,6 +9,7 @@ import { IGatewayNetwork } from "./interfaces/IGatewayNetwork.sol";
 import { IGatewayGatekeeper } from './interfaces/IGatewayGatekeeper.sol';
 import { IGatewayStaking } from './interfaces/IGatewayStaking.sol';
 import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import {Common__MissingAccount} from "./library/CommonErrors.sol";
 
 contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork, UUPSUpgradeable {
     using BitMask for uint256;
@@ -37,11 +38,15 @@ contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork, UUPSUpgr
     }
 
     function initialize(address owner, address gatewayGatekeeperContractAddress, address gatewayStakingContractAddress) initializer public {
+        if (owner == address(0)) revert Common__MissingAccount();
         _superAdmins[owner] = true;
 
         // Allow contract deployer to set NETWORK_FEE_PAYER_ROLE role
         _grantRole(DEFAULT_ADMIN_ROLE, 0, owner);
         _setRoleAdmin(NETWORK_FEE_PAYER_ROLE, 0, DEFAULT_ADMIN_ROLE);
+
+        if (gatewayGatekeeperContractAddress == address(0)) revert Common__MissingAccount();
+        if (gatewayStakingContractAddress == address(0)) revert Common__MissingAccount();
 
         _gatewayGatekeeperContractAddress = gatewayGatekeeperContractAddress;
         _gatewayGatekeeperStakingContractAddress = gatewayStakingContractAddress;

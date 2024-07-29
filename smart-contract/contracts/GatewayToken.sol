@@ -450,6 +450,11 @@ contract GatewayToken is
      * @param chargeHandler ChargeHandler contract address
      */
     function _setChargeHandler(address chargeHandler) internal {
+
+        if (chargeHandler == address(0)) {
+            revert Common__MissingAccount();
+        }
+        
         _chargeHandler = IChargeHandler(chargeHandler);
 
         emit ChargeHandlerUpdated(chargeHandler);

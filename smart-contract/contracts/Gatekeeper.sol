@@ -5,7 +5,7 @@ import { IGatewayGatekeeper } from './interfaces/IGatewayGatekeeper.sol';
 import { IGatewayNetwork } from "./interfaces/IGatewayNetwork.sol";
 import { ParameterizedAccessControl } from "./ParameterizedAccessControl.sol";
 import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-
+import {Common__MissingAccount} from "./library/CommonErrors.sol";
 
 contract Gatekeeper is ParameterizedAccessControl, IGatewayGatekeeper, UUPSUpgradeable {
     address public _gatewayNetworkContract;
@@ -25,10 +25,12 @@ contract Gatekeeper is ParameterizedAccessControl, IGatewayGatekeeper, UUPSUpgra
 
     function initialize(address owner) initializer public {
       // Contract deployer is the initial super admin
+      if (owner == address(0)) revert Common__MissingAccount();
       _superAdmins[owner] = true;
     }
 
     function setNetworkContractAddress(address gatewayNetworkContract) external onlySuperAdmin override {
+        if (gatewayNetworkContract == address(0)) revert Common__MissingAccount();
         _gatewayNetworkContract = gatewayNetworkContract;
     }
 
