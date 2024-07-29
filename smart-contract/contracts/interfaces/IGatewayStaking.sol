@@ -4,6 +4,7 @@ pragma solidity >=0.8.19;
 import { ERC4626 } from "@openzeppelin/contracts/token/ERC20/extensions/ERC4626.sol";
 import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 abstract contract  IGatewayStaking is ERC4626 {
 
@@ -50,5 +51,13 @@ abstract contract  IGatewayStaking is ERC4626 {
         require(ERC20(address(this)).balanceOf(msg.sender) >= shares, "Message sender does not have enough shares to redeem the requested shares");
         return shares;
     }
+
+    function transferFrom(address from, address to, uint256 value) public override(ERC20, IERC20) returns (bool) {
+        revert VaultMethodNotImplemented();
+   }
+
+   function transfer(address to, uint256 value) public override(ERC20, IERC20) returns (bool) {
+      revert VaultMethodNotImplemented();
+   }
 
 }
