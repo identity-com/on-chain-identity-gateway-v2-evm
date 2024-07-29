@@ -254,7 +254,7 @@ contract GatewayToken is
      * @dev Triggers to unfreeze gateway token
      * @param tokenId Gateway token id
      */
-    function unfreeze(uint tokenId, ChargeParties memory partiesInCharge) external virtual {
+    function unfreeze(uint tokenId, ChargeParties memory partiesInCharge) external payable virtual {
         _checkGatekeeper(slotOf(tokenId));
 
         _unfreeze(tokenId);
