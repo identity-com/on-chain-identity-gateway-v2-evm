@@ -188,6 +188,10 @@ contract GatewayToken is
      */
     function burn(uint tokenId) external virtual {
         _checkGatekeeper(slotOf(tokenId));
+
+        address gatekeeper = _msgSender();
+        _checkIfGatekeeperHasMinimumStake(gatekeeper);
+
         _burn(tokenId);
     }
 
@@ -234,6 +238,9 @@ contract GatewayToken is
     function revoke(uint tokenId) external virtual override {
         _checkGatekeeper(slotOf(tokenId));
 
+        address gatekeeper = _msgSender();
+        _checkIfGatekeeperHasMinimumStake(gatekeeper);
+
         _tokenStates[tokenId] = TokenState.REVOKED;
 
 
@@ -247,6 +254,9 @@ contract GatewayToken is
     function freeze(uint tokenId) external virtual {
         _checkGatekeeper(slotOf(tokenId));
 
+        address gatekeeper = _msgSender();
+        _checkIfGatekeeperHasMinimumStake(gatekeeper);
+        
         _freeze(tokenId);
     }
 
@@ -632,6 +642,14 @@ contract GatewayToken is
     function _checkTokenExists(uint tokenId) internal view {
         if (!_exists(tokenId)) {
             revert GatewayToken__TokenDoesNotExist(tokenId);
+        }
+    }
+
+    function _checkIfGatekeeperHasMinimumStake(address gatekeeper)internal view{
+        bool gateKeeperHasMinimumStake = IGatewayStaking(_gatewayStakingContract).hasMinimumGatekeeperStake(gatekeeper);
+
+        if(!gateKeeperHasMinimumStake) {
+            revert GatewayToken__GatekeeperDoesNotMeetStakingRequirements();
         }
     }
 }
