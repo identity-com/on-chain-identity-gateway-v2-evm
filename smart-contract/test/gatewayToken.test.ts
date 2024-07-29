@@ -1122,7 +1122,8 @@ describe('GatewayToken', async () => {
 
     // The forwarder allows two transactions to be sent with the same nonce, as long as they are different
     // this is important for relayer support
-    it('Forwards transactions out of sync', async () => {
+    // Removed support the same nonce being reused to protect against signature relay attacks
+    it.skip('Forwards transactions out of sync', async () => {
       // create two transactions, that share the same forwarder nonce
       const tx1 = await gatewayToken
         .connect(gatekeeper)
@@ -1149,7 +1150,7 @@ describe('GatewayToken', async () => {
       expect(receipt1.status).to.equal(1);
     });
 
-    // Transactions cannot be replayed. This is important if "out-of-sync" sending is enabled.
+    // Transactions cannot be replayed.
     it('Protects against replay attacks', async () => {
       const userToBeFrozen = randomWallet();
       // mint and freeze a user's token
@@ -1180,7 +1181,7 @@ describe('GatewayToken', async () => {
         .execute(forwardedUnfreezeTx.request, forwardedUnfreezeTx.signature, { gasLimit: 1000000 });
       // const shouldFail = attemptedReplayTransactionResponse.wait();
       // expect(attemptedReplayTransactionReceipt.status).to.equal(0);
-      await expect(shouldFail).to.be.revertedWithCustomError(forwarder, 'FlexibleNonceForwarder__TxAlreadySeen');
+      await expect(shouldFail).to.be.revertedWithCustomError(forwarder, 'FlexibleNonceForwarder__InvalidNonce');
       expect(await checkVerification(userToBeFrozen.address, gkn1)).to.be.false;
     });
 
@@ -1225,7 +1226,7 @@ describe('GatewayToken', async () => {
       const shouldFail = intolerantForwarder
         .connect(alice)
         .execute(req2.request, req2.signature, { gasLimit: 1000000 });
-      await expect(shouldFail).to.be.revertedWithCustomError(forwarder, 'FlexibleNonceForwarder__TxTooOld');
+      await expect(shouldFail).to.be.revertedWithCustomError(forwarder, 'FlexibleNonceForwarder__InvalidNonce');
     });
 
     it('Refunds excess Eth sent with a transaction', async () => {
