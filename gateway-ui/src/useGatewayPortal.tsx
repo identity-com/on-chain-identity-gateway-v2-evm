@@ -86,13 +86,12 @@ export const useGatewayPortal = (props: GatewayPortalProps) => {
             const networkResponse = await networkClient.getNetwork(networkId.toString());
 
             // Verify if userAddress has a valid pass
-            const tokenData = await tokenClient.getFirstTokenOnNetwork(userAddress, networkId.valueOf() as bigint);
+            const tokenData = await tokenClient.getFirstTokenOnNetwork(userAddress, networkId.valueOf() as bigint, true);
             const hasValidToken = tokenData && tokenData.state == TokenState.ACTIVE;
 
             // set state
 
             if(hasValidToken) {
-                const tokenData = await tokenClient.getFirstTokenOnNetwork(userAddress, networkId.valueOf() as bigint, true);
                 const tokenGatekeeper = await tokenClient.getTokenGatekeeper(tokenData.tokenId.toString());
 
                 const feeTokenAddress = await networkResponse.supportedToken;
