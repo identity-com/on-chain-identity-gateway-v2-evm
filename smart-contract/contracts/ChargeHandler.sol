@@ -67,6 +67,7 @@ contract ChargeHandler is
     }
 
     function setNetworkContractAddress(address gatewayNetworkContract) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        if (gatewayNetworkContract == address(0)) revert Common__MissingAccount();
         _gatewayNetworkContract = gatewayNetworkContract;
     }
 
