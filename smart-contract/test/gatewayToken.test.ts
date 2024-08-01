@@ -1540,7 +1540,7 @@ describe('GatewayToken', async () => {
         // fast forward to after time lock unlocks
         const delayInSeconds = await gatewayStakingContract.DEPOSIT_TIMELOCK_TIME();
         await time.increase(delayInSeconds.toNumber() + 10);
-        
+
         await gatewayStakingContract.connect(gatekeeper).withdrawStake(gatekeeperShares);
       }
     })
@@ -2337,6 +2337,62 @@ describe('GatewayToken', async () => {
       });
     });
   });
+
+  describe('Test gateway network features', async() => {
+    beforeEach('reset gatekeepers', async () => {
+  
+      // re-create gatekeeper network
+      const networkOne = getNetwork(identityCom.address, 'GKN-1');
+
+
+      const networkOneFeeBalance = await gatewayNetwork.networkFeeBalances(networkOne.name);
+
+      // withdraw fees from networks
+      if(networkOneFeeBalance.gt(0)) { await gatewayNetwork.connect(identityCom).withdrawNetworkFees(networkOne.name, {gasLimit: 300000 })}
+
+
+      // remove networks gatekeeper and close networks
+      await gatewayNetwork.connect(identityCom).removeGatekeeper(gatekeeper.address, networkOne.name);
+
+      await gatewayNetwork.connect(identityCom).closeNetwork(networkOne.name);
+  
+      // recreate networks so fees can be updated in each test
+      await gatewayNetwork.connect(identityCom).createNetwork(networkOne);
+  
+      await gatewayNetwork.connect(identityCom).addGatekeeper(gatekeeper.address.toString(), utils.formatBytes32String('GKN-1'));
+    });
+
+    it('gateway token should still be valid after gatekeeper is removed', async () => {
+      await gatewayToken.connect(gatekeeper).mint(alice.address, gkn1, 0, 0, {
+        recipient: gatekeeper.address,
+        tokenSender: ZERO_ADDRESS,
+      }); 
+
+      // remove gatekeeper that issued token
+      const networkOne = getNetwork(identityCom.address, 'GKN-1');
+      await gatewayNetwork.connect(identityCom).removeGatekeeper(gatekeeper.address, networkOne.name);
+
+      return expect(await checkVerification(alice.address, gkn1)).to.be.true;
+    })
+
+    it('gateway token should not be valid after gatekeeper is removed when network has REMOVE_GATEKEEPER_INVALIDATES_TOKENS feature', async () => {
+      // add network feature mask
+      const networkOne = getNetwork(identityCom.address, 'GKN-1');
+      // Add feature flag
+      await gatewayNetwork.connect(identityCom).updateNetworkFeatures(1, networkOne.name);
+      
+      // issue token
+      await gatewayToken.connect(gatekeeper).mint(alice.address, gkn1, 0, 0, {
+        recipient: gatekeeper.address,
+        tokenSender: ZERO_ADDRESS,
+      }); 
+
+      // remove gatekeeper that issued token
+      await gatewayNetwork.connect(identityCom).removeGatekeeper(gatekeeper.address, networkOne.name);
+
+      return expect(await checkVerification(alice.address, gkn1)).to.be.false;
+    })
+  })
 
   describe('Test gateway token future version upgradeability', async () => {
 

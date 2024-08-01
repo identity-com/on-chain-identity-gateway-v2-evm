@@ -592,7 +592,6 @@ contract GatewayToken is
 
         // if the network has the REMOVE_GATEKEEPER_INVALIDATES_TOKENS feature,
         // check that the gatekeeper is still in the gatekeeper network.
-        // tokens issued without gatekeepers are exempt.
         uint network = slotOf(tokenId);
         if (IGatewayNetwork(_gatewayNetworkContract).networkHasFeature(bytes32(network), IGatewayNetwork.NetworkFeature.REMOVE_GATEKEEPER_INVALIDATES_TOKENS)) {
             address gatekeeper = _issuingGatekeepers[tokenId];
