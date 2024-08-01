@@ -1537,6 +1537,10 @@ describe('GatewayToken', async () => {
       const gatekeeperShares = await gatewayStakingContract.balanceOf(gatekeeper.address);
 
       if(gatekeeperShares.gt(0)) {
+        // fast forward to after time lock unlocks
+        const delayInSeconds = await gatewayStakingContract.DEPOSIT_TIMELOCK_TIME();
+        await time.increase(delayInSeconds.toNumber() + 10);
+        
         await gatewayStakingContract.connect(gatekeeper).withdrawStake(gatekeeperShares);
       }
     })

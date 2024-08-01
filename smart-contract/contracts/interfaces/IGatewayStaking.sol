@@ -10,7 +10,11 @@ abstract contract  IGatewayStaking is ERC4626 {
 
     uint256 public GLOBAL_MIN_GATEKEEPER_STAKE;
 
+    /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
+    uint256 public immutable DEPOSIT_TIMELOCK_TIME = 7 days;
+
     error VaultMethodNotImplemented();
+    error GatewayStaking_Withdrawal_Locked(uint lastUpdateTimestamp, uint nextAvalibleUpdateTimestamp);
 
    function depositStake(uint256 assests) public virtual returns (uint256);
    
