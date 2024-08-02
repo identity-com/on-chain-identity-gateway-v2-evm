@@ -171,7 +171,7 @@ contract GatewayTokenV0 is
         _freeze(tokenId);
     }
 
-    function unfreeze(uint256 tokenId, ChargeParties calldata partiesInCharge) external {
+    function unfreeze(uint256 tokenId, ChargeParties calldata partiesInCharge) external payable {
         _unfreeze(tokenId);
     }
 

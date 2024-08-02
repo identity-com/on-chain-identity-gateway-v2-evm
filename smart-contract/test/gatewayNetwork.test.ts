@@ -13,7 +13,7 @@ import {
     DummyERC20,
     DummyERC20__factory,
 } from '../typechain-types' ;
-import { BigNumberish, utils } from 'ethers';
+import { BigNumberish, utils, Wallet } from 'ethers';
 import { parseEther } from 'ethers/lib/utils';
 import { defaultNetworkDescription } from './utils/network';
 import { toBytes32 } from './utils';
@@ -364,6 +364,24 @@ describe('GatewayNetwork', () => {
 
             // when
             await expect(gatekeeperNetworkContract.connect(alice).updatePassExpirationTime(newTimestamp, defaultNetwork.name, {gasLimit: 300000})).to.be.rejectedWith("Only the primary authority can perform this action");
+        });
+
+        it('cannot add more than 20 gatekeepers', async () => {
+            // given
+            const gatekeepers: string[] = [];
+
+            for (let i = 0; i < 22; i++) {
+                const wallet = Wallet.createRandom();
+                gatekeepers.push(wallet.address);
+            }
+            
+
+            const currentGatekeepers = await gatekeeperNetworkContract.getGatekeepersOnNetwork(defaultNetwork.name);
+            expect(currentGatekeepers.length).to.be.eq(0);
+
+
+            //then
+            await expect(gatekeeperNetworkContract.connect(primaryAuthority).addGatekeepers(gatekeepers, defaultNetwork.name, {gasLimit: 300000})).to.be.rejected;
         });
 
         it('cannot update network fees if not primary authority', async () => {

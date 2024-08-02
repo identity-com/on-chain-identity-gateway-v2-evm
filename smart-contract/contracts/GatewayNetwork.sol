@@ -137,7 +137,6 @@ contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork, UUPSUpgr
     function addGatekeeper(address gatekeeper, bytes32 networkName) public override onlyPrimaryNetworkAuthority(networkName){
         require(_networks[networkName].primaryAuthority != address(0), "Network does not exist");
         require(gatekeeper != address(0), "Zero address cannot be added as a gatekeeper");
-
         bool isAlreadyGatekeeper = isGateKeeper(networkName, gatekeeper);
 
         if(isAlreadyGatekeeper) {
@@ -149,6 +148,8 @@ contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork, UUPSUpgr
         require(hasMinimumStake, "Address does not meet the minimum stake requirements of the gateway protocol");
 
         GatekeeperNetworkData storage networkData = _networks[networkName];
+
+        require(networkData.gatekeepers.length <= 20, "Gateway network cannot have more than 20 gatekeepers");
   
         networkData.gatekeepers.push(gatekeeper);
 
