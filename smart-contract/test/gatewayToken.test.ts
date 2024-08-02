@@ -587,6 +587,8 @@ describe('GatewayToken', async () => {
     it('onlyActive should determine whether an expired token is returned or not', async () => {
       const aliceTokenIdsGKN1 = await gatewayToken.getTokenIdsByOwnerAndNetwork(alice.address, gkn1, true);
       const beforeExpiration = await gatewayToken.getExpiration(aliceTokenIdsGKN1[1]);
+
+      await gatewayNetwork.connect(identityCom).updatePassExpirationTime(0, utils.formatBytes32String('GKN-1'));
       await gatewayToken
         .connect(gatekeeper)
         .setExpiration(aliceTokenIdsGKN1[1], Date.parse('2020-01-01') / 1000, {
@@ -613,6 +615,8 @@ describe('GatewayToken', async () => {
         recipient: gatekeeper.address,
         tokenSender: ZERO_ADDRESS,
       });
+
+      await gatewayNetwork.connect(identityCom).updatePassExpirationTime(1000000, utils.formatBytes32String('GKN-1'));
     });
 
     it('Try to transfer a token, expect revert', async () => {
@@ -1122,7 +1126,8 @@ describe('GatewayToken', async () => {
 
     // The forwarder allows two transactions to be sent with the same nonce, as long as they are different
     // this is important for relayer support
-    it('Forwards transactions out of sync', async () => {
+    // Removed support the same nonce being reused to protect against signature relay attacks
+    it.skip('Forwards transactions out of sync', async () => {
       // create two transactions, that share the same forwarder nonce
       const tx1 = await gatewayToken
         .connect(gatekeeper)
@@ -1149,7 +1154,7 @@ describe('GatewayToken', async () => {
       expect(receipt1.status).to.equal(1);
     });
 
-    // Transactions cannot be replayed. This is important if "out-of-sync" sending is enabled.
+    // Transactions cannot be replayed.
     it('Protects against replay attacks', async () => {
       const userToBeFrozen = randomWallet();
       // mint and freeze a user's token
@@ -1180,7 +1185,7 @@ describe('GatewayToken', async () => {
         .execute(forwardedUnfreezeTx.request, forwardedUnfreezeTx.signature, { gasLimit: 1000000 });
       // const shouldFail = attemptedReplayTransactionResponse.wait();
       // expect(attemptedReplayTransactionReceipt.status).to.equal(0);
-      await expect(shouldFail).to.be.revertedWithCustomError(forwarder, 'FlexibleNonceForwarder__TxAlreadySeen');
+      await expect(shouldFail).to.be.revertedWithCustomError(forwarder, 'FlexibleNonceForwarder__InvalidNonce');
       expect(await checkVerification(userToBeFrozen.address, gkn1)).to.be.false;
     });
 
@@ -1225,7 +1230,7 @@ describe('GatewayToken', async () => {
       const shouldFail = intolerantForwarder
         .connect(alice)
         .execute(req2.request, req2.signature, { gasLimit: 1000000 });
-      await expect(shouldFail).to.be.revertedWithCustomError(forwarder, 'FlexibleNonceForwarder__TxTooOld');
+      await expect(shouldFail).to.be.revertedWithCustomError(forwarder, 'FlexibleNonceForwarder__InvalidNonce');
     });
 
     it('Refunds excess Eth sent with a transaction', async () => {
@@ -1532,6 +1537,10 @@ describe('GatewayToken', async () => {
       const gatekeeperShares = await gatewayStakingContract.balanceOf(gatekeeper.address);
 
       if(gatekeeperShares.gt(0)) {
+        // fast forward to after time lock unlocks
+        const delayInSeconds = await gatewayStakingContract.DEPOSIT_TIMELOCK_TIME();
+        await time.increase(delayInSeconds.toNumber() + 10);
+
         await gatewayStakingContract.connect(gatekeeper).withdrawStake(gatekeeperShares);
       }
     })
@@ -2328,6 +2337,68 @@ describe('GatewayToken', async () => {
       });
     });
   });
+
+  describe('Test gateway network features', async() => {
+    before('reset gatekeepers', async () => {
+  
+      // re-create gatekeeper network
+      const networkOne = getNetwork(identityCom.address, 'GKN-1');
+
+
+      const networkOneFeeBalance = await gatewayNetwork.networkFeeBalances(networkOne.name);
+
+      // withdraw fees from networks
+      if(networkOneFeeBalance.gt(0)) { await gatewayNetwork.connect(identityCom).withdrawNetworkFees(networkOne.name, {gasLimit: 300000 })}
+
+
+      // remove networks gatekeeper and close networks
+      await gatewayNetwork.connect(identityCom).removeGatekeeper(gatekeeper.address, networkOne.name);
+
+      await gatewayNetwork.connect(identityCom).closeNetwork(networkOne.name);
+  
+      // recreate networks so fees can be updated in each test
+      await gatewayNetwork.connect(identityCom).createNetwork(networkOne);
+  
+      await gatewayNetwork.connect(identityCom).addGatekeeper(gatekeeper.address.toString(), utils.formatBytes32String('GKN-1'));
+    });
+
+    it('gateway token should still be valid after gatekeeper is removed', async () => {
+      await gatewayToken.connect(gatekeeper).mint(alice.address, gkn1, 0, 0, {
+        recipient: gatekeeper.address,
+        tokenSender: ZERO_ADDRESS,
+      }); 
+
+      // remove gatekeeper that issued token
+      const networkOne = getNetwork(identityCom.address, 'GKN-1');
+      await gatewayNetwork.connect(identityCom).removeGatekeeper(gatekeeper.address, networkOne.name);
+
+      expect(await checkVerification(alice.address, gkn1)).to.be.true;
+
+      // add gatekeeper back to network
+      await gatewayNetwork.connect(identityCom).addGatekeeper(gatekeeper.address.toString(), utils.formatBytes32String('GKN-1'));
+    })
+
+    it('gateway token should not be valid after gatekeeper is removed when network has REMOVE_GATEKEEPER_INVALIDATES_TOKENS feature', async () => {
+      // add network feature mask
+      const networkOne = getNetwork(identityCom.address, 'GKN-1');
+      // Add feature flag
+      await gatewayNetwork.connect(identityCom).updateNetworkFeatures(1, networkOne.name);
+      
+      // issue token
+      await gatewayToken.connect(gatekeeper).mint(alice.address, gkn1, 0, 0, {
+        recipient: gatekeeper.address,
+        tokenSender: ZERO_ADDRESS,
+      }); 
+
+      // remove gatekeeper that issued token
+      await gatewayNetwork.connect(identityCom).removeGatekeeper(gatekeeper.address, networkOne.name);
+
+      expect(await checkVerification(alice.address, gkn1)).to.be.false;
+
+      // add gatekeeper back to network
+      await gatewayNetwork.connect(identityCom).addGatekeeper(gatekeeper.address.toString(), utils.formatBytes32String('GKN-1'));
+    })
+  })
 
   describe('Test gateway token future version upgradeability', async () => {
 

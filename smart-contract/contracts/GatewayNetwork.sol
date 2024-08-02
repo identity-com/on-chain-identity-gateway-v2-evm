@@ -124,7 +124,6 @@ contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork, UUPSUpgr
     }
 
     function closeNetwork(bytes32 networkName) external override onlyPrimaryNetworkAuthority(networkName) {
-        require(_networks[networkName].primaryAuthority != address(0), "Network does not exist");
         require(_networks[networkName].gatekeepers.length == 0, "Network can only be removed if no gatekeepers are in it");
         require(networkFeeBalances[networkName] == 0, "Network has fees that need to be withdrawn");
 
@@ -134,16 +133,8 @@ contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork, UUPSUpgr
         emit GatekeeperNetworkDeleted(networkName);
     }
 
-    function addGatekeepers(address[] memory gatekeepers, bytes32 networkName) external override onlyPrimaryNetworkAuthority(networkName){
-        for(uint i = 0; i < gatekeepers.length; i++) {
-            this.addGatekeeper(gatekeepers[i], networkName);
-        }
-    }
-
-    function addGatekeeper(address gatekeeper, bytes32 networkName) external override onlyPrimaryNetworkAuthority(networkName){
-        require(_networks[networkName].primaryAuthority != address(0), "Network does not exist");
+    function addGatekeeper(address gatekeeper, bytes32 networkName) public override onlyPrimaryNetworkAuthority(networkName){
         require(gatekeeper != address(0), "Zero address cannot be added as a gatekeeper");
-
         bool isAlreadyGatekeeper = isGateKeeper(networkName, gatekeeper);
 
         if(isAlreadyGatekeeper) {
@@ -155,6 +146,8 @@ contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork, UUPSUpgr
         require(hasMinimumStake, "Address does not meet the minimum stake requirements of the gateway protocol");
 
         GatekeeperNetworkData storage networkData = _networks[networkName];
+
+        require(networkData.gatekeepers.length <= 20, "Gateway network cannot have more than 20 gatekeepers");
   
         networkData.gatekeepers.push(gatekeeper);
 
@@ -162,8 +155,13 @@ contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork, UUPSUpgr
         emit GatekeeperNetworkGatekeeperAdded(gatekeeper);
     }
 
+    function addGatekeepers(address[] memory gatekeepers, bytes32 networkName) external override onlyPrimaryNetworkAuthority(networkName){
+        for(uint i = 0; i < gatekeepers.length; i++) {
+            addGatekeeper(gatekeepers[i], networkName);
+        }
+    }
+
     function removeGatekeeper(address gatekeeper, bytes32 networkName) external override onlyPrimaryNetworkAuthority(networkName){
-        require(_networks[networkName].primaryAuthority != address(0), "Network does not exist");
         bool isAlreadyGatekeeper = isGateKeeper(networkName, gatekeeper);
 
         if(!isAlreadyGatekeeper) {
@@ -208,7 +206,6 @@ contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork, UUPSUpgr
     } 
 
     function updatePassExpirationTime(uint newExpirationTimeInSeconds, bytes32 networkName) external override onlyPrimaryNetworkAuthority(networkName) {
-        require(doesNetworkExist(uint(networkName)), "Network does not exist");
         _networks[networkName].passExpireDurationInSeconds = newExpirationTimeInSeconds;
     }
 
@@ -283,13 +280,6 @@ contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork, UUPSUpgr
     function getGatekeepersOnNetwork(bytes32 networkName) public view returns(address[] memory) {
         require(_networks[networkName].primaryAuthority != address(0), "Network does not exist");
         return _networks[networkName].gatekeepers;
-    }
-
-    /**
-     * @dev Fallback function to receive ETH disabled
-     */
-    receive() external payable {
-        revert GatewayNetwork_Cannot_Be_Sent_Eth_Directly();
     }
 
     function _authorizeUpgrade(address) internal override onlySuperAdmin {}

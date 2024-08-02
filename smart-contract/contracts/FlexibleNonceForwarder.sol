@@ -11,14 +11,10 @@ contract FlexibleNonceForwarder is IForwarder, EIP712, ReentrancyGuard {
     using ECDSA for bytes32;
     using Address for address payable;
 
-    struct SigsForNonce {
-        mapping(bytes => bool) sigs;
-    }
 
     struct FlexibleNonce {
         uint256 currentNonce;
         uint256 block; // when this nonce was first used - used to age transactions
-        mapping(uint256 => SigsForNonce) sigsForNonce;
     }
 
     bytes32 private constant _TYPEHASH =
@@ -32,6 +28,8 @@ contract FlexibleNonceForwarder is IForwarder, EIP712, ReentrancyGuard {
 
     /// The tx to be forwarded is not signed by the request sender.
     error FlexibleNonceForwarder__InvalidSigner(address signer, address expectedSigner);
+
+    error FlexibleNonceForwarder__InvalidNonce();
 
     /// The tx to be forwarded has already been seen.
     error FlexibleNonceForwarder__TxAlreadySeen();
@@ -48,7 +46,6 @@ contract FlexibleNonceForwarder is IForwarder, EIP712, ReentrancyGuard {
         bytes calldata signature
     ) external payable nonReentrant returns (bool, bytes memory) {
         _verifyFlexibleNonce(req, signature);
-        _refundExcessValue(req);
 
         (bool success, bytes memory returndata) = req.to.call{gas: req.gas, value: req.value}(
             abi.encodePacked(req.data, req.from)
@@ -75,6 +72,8 @@ contract FlexibleNonceForwarder is IForwarder, EIP712, ReentrancyGuard {
         }
         emit ForwardResult(success);
 
+        _refundExcessValue(req);
+
         return (success, returndata);
     }
 
@@ -97,18 +96,8 @@ contract FlexibleNonceForwarder is IForwarder, EIP712, ReentrancyGuard {
             _nonces[req.from].block = block.number;
         } else {
             // request nonce is not expected next nonce - check if we have seen this signature before
-            if (_nonces[req.from].sigsForNonce[req.nonce].sigs[signature]) {
-                revert FlexibleNonceForwarder__TxAlreadySeen();
-            }
-
-            // check if the nonce is too old
-            if (_nonces[req.from].block + _blockAgeTolerance < block.number) {
-                revert FlexibleNonceForwarder__TxTooOld(_nonces[req.from].block, _blockAgeTolerance);
-            }
+            revert FlexibleNonceForwarder__InvalidNonce();
         }
-
-        // store the signature for this nonce to ensure no replay attacks
-        _nonces[req.from].sigsForNonce[req.nonce].sigs[signature] = true;
     }
 
     function _refundExcessValue(ForwardRequest calldata req) internal {

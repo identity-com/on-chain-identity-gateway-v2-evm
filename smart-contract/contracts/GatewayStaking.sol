@@ -10,7 +10,7 @@ import { ERC4626 } from "@openzeppelin/contracts/token/ERC20/extensions/ERC4626.
 import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 contract GatewayStaking is IGatewayStaking, ParameterizedAccessControl, UUPSUpgradeable {
-
+   mapping(address => uint) _lastDepositTimestamp;
    
    constructor(ERC20 asset_, string memory name_, string memory symbol_) ERC4626(asset_) ERC20(name_, symbol_) {
       _disableInitializers();
@@ -23,15 +23,21 @@ contract GatewayStaking is IGatewayStaking, ParameterizedAccessControl, UUPSUpgr
    function depositStake(uint256 assests) public override returns(uint256) {
       // Deposit stake using ERC-4626 deposit method
       require(assests > 0, "Must deposit assets to receive shares");
-      deposit(assests, msg.sender);
+      _lastDepositTimestamp[msg.sender] = block.timestamp;
+      return deposit(assests, msg.sender);
    }
 
    function withdrawStake(uint256 shares) public override returns (uint256) {
       // checks
       require(shares > 0, "Must burn shares to receive assets");
 
+      uint lastDepositTimestamp = _lastDepositTimestamp[msg.sender];
+      // check if time lock has expired
+      if(lastDepositTimestamp != 0 && block.timestamp < lastDepositTimestamp + DEPOSIT_TIMELOCK_TIME) {
+         revert GatewayStaking_Withdrawal_Locked(lastDepositTimestamp, lastDepositTimestamp + DEPOSIT_TIMELOCK_TIME);
+      }
       // Redeem stake using ERC-4626 redeem method
-      redeem(shares, msg.sender, msg.sender);
+      return redeem(shares, msg.sender, msg.sender);
    }
 
    function setMinimumGatekeeperStake (uint256 minStakeAmount) public override onlySuperAdmin {

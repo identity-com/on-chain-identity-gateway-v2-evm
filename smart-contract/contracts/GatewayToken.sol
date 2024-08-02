@@ -149,6 +149,10 @@ contract GatewayToken is
     }
 
     function addForwarder(address forwarder) external onlySuperAdmin {
+        if (forwarder == address(0)) {
+           revert Common__MissingAccount();
+        }
+        
         _addForwarder(forwarder);
         emit ForwarderAdded(forwarder);
     }
@@ -188,6 +192,10 @@ contract GatewayToken is
      */
     function burn(uint tokenId) external virtual {
         _checkGatekeeper(slotOf(tokenId));
+
+        address gatekeeper = _msgSender();
+        _checkIfGatekeeperHasMinimumStake(gatekeeper);
+
         _burn(tokenId);
     }
 
@@ -234,6 +242,9 @@ contract GatewayToken is
     function revoke(uint tokenId) external virtual override {
         _checkGatekeeper(slotOf(tokenId));
 
+        address gatekeeper = _msgSender();
+        _checkIfGatekeeperHasMinimumStake(gatekeeper);
+
         _tokenStates[tokenId] = TokenState.REVOKED;
 
 
@@ -247,6 +258,9 @@ contract GatewayToken is
     function freeze(uint tokenId) external virtual {
         _checkGatekeeper(slotOf(tokenId));
 
+        address gatekeeper = _msgSender();
+        _checkIfGatekeeperHasMinimumStake(gatekeeper);
+        
         _freeze(tokenId);
     }
 
@@ -254,7 +268,7 @@ contract GatewayToken is
      * @dev Triggers to unfreeze gateway token
      * @param tokenId Gateway token id
      */
-    function unfreeze(uint tokenId, ChargeParties memory partiesInCharge) external virtual {
+    function unfreeze(uint tokenId, ChargeParties memory partiesInCharge) external payable virtual {
         _checkGatekeeper(slotOf(tokenId));
 
         _unfreeze(tokenId);
@@ -273,7 +287,15 @@ contract GatewayToken is
     function setExpiration(uint tokenId, uint timestamp, ChargeParties calldata partiesInCharge) external payable virtual {
         // CHECKS
         uint network = slotOf(tokenId);
-        _checkGatekeeper(slotOf(tokenId));
+        _checkGatekeeper(network);
+
+        uint networkDefaultExpiration = IGatewayNetwork(_gatewayNetworkContract).getNetwork(network).passExpireDurationInSeconds;
+        uint tokenExpiration = _expirations[tokenId];
+
+        // If network set a tokens expiration, it can not be updated until the networkExpiration expires
+        if (networkDefaultExpiration > 0) {
+            require(block.timestamp >= tokenExpiration, "Network expiration must expire");
+        }
 
         address gatekeeper = _msgSender();
         // EFFECTS
@@ -324,9 +346,10 @@ contract GatewayToken is
     /**
      * @dev Triggered by external contract to verify the validity of the default token for `owner`.
      *
-     * Checks owner has any token on gateway token contract, `tokenId` still active, and not expired.
+     * Checks owner has any token on gateway token contract, `tokenId` still active, and not expired. Reverts if tokenId does not exist.
      */
     function verifyToken(uint tokenId) external virtual returns (bool) {
+        // Reverts if tokenId does not exist.
         bool doesExistAndIsActive = _existsAndActive(tokenId, false);
 
         return doesExistAndIsActive;
@@ -435,7 +458,7 @@ contract GatewayToken is
      */
     function _setExpiration(uint tokenId, uint timestamp) internal virtual {
         _checkActiveToken(tokenId, true);
-
+        
         _expirations[tokenId] = timestamp;
         emit Expiration(tokenId, timestamp);
     }
@@ -487,17 +510,7 @@ contract GatewayToken is
             networkData.supportedToken, 
             partiesInCharge
         );
-        // solhint-disable-next-line no-empty-blocks
-        try _chargeHandler.handleCharge{value: msg.value}(charge, networkId) {
-            // done
-        } catch (bytes memory reason) {
-            // Rethrow the custom error from the charge handler
-            // Using inline assembly here avoids the need to parse the revert reason
-            // solhint-disable-next-line no-inline-assembly
-            assembly {
-                revert(add(32, reason), mload(reason))
-            }
-        }
+        _chargeHandler.handleCharge{value: msg.value}(charge, networkId);
     }
 
     function _resolveTotalFeeAmount(FeeType feeType, IGatewayGatekeeper.GatekeeperNetworkData memory gatekeeperData, IGatewayNetwork.GatekeeperNetworkData memory networkData) internal pure returns(uint256, uint16) {
@@ -563,7 +576,7 @@ contract GatewayToken is
     }
 
     /**
-     * @dev Returns whether `tokenId` exists and not frozen.
+     * @dev Returns whether `tokenId` is not frozen. Reverts if tokenId does not exist.
      */
     function _existsAndActive(uint tokenId, bool allowExpired) internal view virtual returns (bool) {
         // check state before anything else. This reduces the overhead,
@@ -573,7 +586,6 @@ contract GatewayToken is
 
         // if the network has the REMOVE_GATEKEEPER_INVALIDATES_TOKENS feature,
         // check that the gatekeeper is still in the gatekeeper network.
-        // tokens issued without gatekeepers are exempt.
         uint network = slotOf(tokenId);
         if (IGatewayNetwork(_gatewayNetworkContract).networkHasFeature(bytes32(network), IGatewayNetwork.NetworkFeature.REMOVE_GATEKEEPER_INVALIDATES_TOKENS)) {
             address gatekeeper = _issuingGatekeepers[tokenId];
@@ -594,11 +606,6 @@ contract GatewayToken is
         return false; // transfers are restricted, so this can never pass
     }
 
-    /// @dev Checks if the sender has the specified role on the specified network and revert otherwise
-    function _checkSenderRole(bytes32 role, uint network) internal view {
-        _checkRole(role, network, _msgSender());
-    }
-
     function _checkGatekeeper(uint network) internal view {
         // Checks if message sender is a gatekeeper on the given network
         bool isGatekeeper = IGatewayNetwork(_gatewayNetworkContract).isGateKeeper(bytes32(network), _msgSender());
@@ -610,8 +617,9 @@ contract GatewayToken is
 
     /// @dev Checks if the token exists and is active. Optionally ignore expiry.
     /// Use this when you need to check if a token exists, and is not frozen or revoked
-    /// But you don't care about its expiry, e.g. you are extending the expiry.
+    /// Reverts if tokenId does not exist.
     function _checkActiveToken(uint tokenId, bool allowExpired) internal view {
+        // Reverts if tokenId does not exist.
         if (!_existsAndActive(tokenId, allowExpired)) {
             revert GatewayToken__TokenDoesNotExistOrIsInactive(tokenId, allowExpired);
         }
@@ -621,6 +629,14 @@ contract GatewayToken is
     function _checkTokenExists(uint tokenId) internal view {
         if (!_exists(tokenId)) {
             revert GatewayToken__TokenDoesNotExist(tokenId);
+        }
+    }
+
+    function _checkIfGatekeeperHasMinimumStake(address gatekeeper)internal view{
+        bool gateKeeperHasMinimumStake = IGatewayStaking(_gatewayStakingContract).hasMinimumGatekeeperStake(gatekeeper);
+
+        if(!gateKeeperHasMinimumStake) {
+            revert GatewayToken__GatekeeperDoesNotMeetStakingRequirements();
         }
     }
 }

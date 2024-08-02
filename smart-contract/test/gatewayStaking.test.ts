@@ -7,7 +7,7 @@ import {
     DummyERC20,
     DummyERC20__factory,
 } from '../typechain-types' ;
-
+import { time } from "@nomicfoundation/hardhat-network-helpers";
 import { BigNumberish } from 'ethers';
 
 describe('Gateway Staking', () => {
@@ -135,6 +135,10 @@ describe('Gateway Staking', () => {
 
             expect(await dummyAssetContract.balanceOf(bob.address)).to.eq(0);
 
+            // fast forward to after time lock unlocks
+            const delayInSeconds = await gatewayStakingContract.DEPOSIT_TIMELOCK_TIME();
+            await time.increase(delayInSeconds.toNumber() + 10);
+
             // when
             await gatewayStakingContract.connect(bob).withdrawStake(assetAmount, {gasLimit: 300000});
 
@@ -173,6 +177,9 @@ describe('Gateway Staking', () => {
 
             expect(await dummyAssetContract.balanceOf(bob.address)).to.eq(0);
 
+            // fast forward to after time lock unlocks
+            const delayInSeconds = await gatewayStakingContract.DEPOSIT_TIMELOCK_TIME();
+            await time.increase(delayInSeconds.toNumber() + 1);
             // when
             await gatewayStakingContract.connect(bob).withdrawStake(assetAmount/2, {gasLimit: 300000});
             await gatewayStakingContract.connect(bob).withdrawStake(assetAmount/2, {gasLimit: 300000});
@@ -191,7 +198,24 @@ describe('Gateway Staking', () => {
 
             await gatewayStakingContract.connect(bob).depositStake(assetAmount, {gasLimit: 300000});
 
+            // fast forward to after time lock unlocks
+            const delayInSeconds = await gatewayStakingContract.DEPOSIT_TIMELOCK_TIME();
+            await time.increase(delayInSeconds.toNumber() + 1);
+
             await expect(gatewayStakingContract.connect(bob).withdrawStake(assetAmount * 2, {gasLimit: 300000})).to.be.rejectedWith("ERC4626: redeem more than max");
+        });
+
+        it('should not allow a user to withdraw before timelock', async () => {
+            // given
+            const assetAmount = 500;
+            await giveDummyToken(bob, assetAmount);
+
+            // give staking contract allowance 
+            await dummyAssetContract.connect(bob).increaseAllowance(gatewayStakingContract.address, assetAmount);
+
+            await gatewayStakingContract.connect(bob).depositStake(assetAmount, {gasLimit: 300000});
+
+            await expect(gatewayStakingContract.connect(bob).withdrawStake(assetAmount * 2, {gasLimit: 300000})).to.be.revertedWithCustomError(gatewayStakingContract, 'GatewayStaking_Withdrawal_Locked');
         });
 
         it('should not allow a user to withdraw more shares than they deposited into vault', async () => {
@@ -206,6 +230,10 @@ describe('Gateway Staking', () => {
 
             await gatewayStakingContract.connect(bob).depositStake(assetAmount, {gasLimit: 300000});
             await gatewayStakingContract.connect(alice).depositStake(assetAmount, {gasLimit: 300000});
+
+            // fast forward to after time lock unlocks
+            const delayInSeconds = await gatewayStakingContract.DEPOSIT_TIMELOCK_TIME();
+            await time.increase(delayInSeconds.toNumber() + 1);
 
             await expect(gatewayStakingContract.connect(bob).withdrawStake(assetAmount * 2, {gasLimit: 300000})).to.be.rejectedWith("ERC4626: redeem more than max");
         });
