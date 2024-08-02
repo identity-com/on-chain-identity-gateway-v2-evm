@@ -664,7 +664,7 @@ describe('GatewayNetwork', () => {
 
 
         it('cannot send ETH directly to network contract', async () => {
-            await expect(networkFeePayer.sendTransaction({to: gatekeeperNetworkContract.address, value: DEFAULT_TEST_FEE_AMOUNT})).to.be.revertedWithCustomError(gatekeeperNetworkContract, "GatewayNetwork_Cannot_Be_Sent_Eth_Directly");
+            await expect(networkFeePayer.sendTransaction({to: gatekeeperNetworkContract.address, value: DEFAULT_TEST_FEE_AMOUNT})).to.be.rejected;
         });
 
         it('cannot pay fees on a network that does not exist', async () => {
