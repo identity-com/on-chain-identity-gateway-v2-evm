@@ -46,7 +46,6 @@ contract FlexibleNonceForwarder is IForwarder, EIP712, ReentrancyGuard {
         bytes calldata signature
     ) external payable nonReentrant returns (bool, bytes memory) {
         _verifyFlexibleNonce(req, signature);
-        _refundExcessValue(req);
 
         (bool success, bytes memory returndata) = req.to.call{gas: req.gas, value: req.value}(
             abi.encodePacked(req.data, req.from)
@@ -72,6 +71,8 @@ contract FlexibleNonceForwarder is IForwarder, EIP712, ReentrancyGuard {
             }
         }
         emit ForwardResult(success);
+
+        _refundExcessValue(req);
 
         return (success, returndata);
     }

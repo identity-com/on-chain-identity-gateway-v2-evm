@@ -2339,7 +2339,7 @@ describe('GatewayToken', async () => {
   });
 
   describe('Test gateway network features', async() => {
-    beforeEach('reset gatekeepers', async () => {
+    before('reset gatekeepers', async () => {
   
       // re-create gatekeeper network
       const networkOne = getNetwork(identityCom.address, 'GKN-1');
@@ -2372,7 +2372,10 @@ describe('GatewayToken', async () => {
       const networkOne = getNetwork(identityCom.address, 'GKN-1');
       await gatewayNetwork.connect(identityCom).removeGatekeeper(gatekeeper.address, networkOne.name);
 
-      return expect(await checkVerification(alice.address, gkn1)).to.be.true;
+      expect(await checkVerification(alice.address, gkn1)).to.be.true;
+
+      // add gatekeeper back to network
+      await gatewayNetwork.connect(identityCom).addGatekeeper(gatekeeper.address.toString(), utils.formatBytes32String('GKN-1'));
     })
 
     it('gateway token should not be valid after gatekeeper is removed when network has REMOVE_GATEKEEPER_INVALIDATES_TOKENS feature', async () => {
@@ -2390,7 +2393,10 @@ describe('GatewayToken', async () => {
       // remove gatekeeper that issued token
       await gatewayNetwork.connect(identityCom).removeGatekeeper(gatekeeper.address, networkOne.name);
 
-      return expect(await checkVerification(alice.address, gkn1)).to.be.false;
+      expect(await checkVerification(alice.address, gkn1)).to.be.false;
+
+      // add gatekeeper back to network
+      await gatewayNetwork.connect(identityCom).addGatekeeper(gatekeeper.address.toString(), utils.formatBytes32String('GKN-1'));
     })
   })
 

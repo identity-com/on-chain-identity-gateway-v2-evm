@@ -149,6 +149,10 @@ contract GatewayToken is
     }
 
     function addForwarder(address forwarder) external onlySuperAdmin {
+        if (forwarder == address(0)) {
+           revert Common__MissingAccount();
+        }
+        
         _addForwarder(forwarder);
         emit ForwarderAdded(forwarder);
     }
@@ -283,7 +287,7 @@ contract GatewayToken is
     function setExpiration(uint tokenId, uint timestamp, ChargeParties calldata partiesInCharge) external payable virtual {
         // CHECKS
         uint network = slotOf(tokenId);
-        _checkGatekeeper(slotOf(tokenId));
+        _checkGatekeeper(network);
 
         uint networkDefaultExpiration = IGatewayNetwork(_gatewayNetworkContract).getNetwork(network).passExpireDurationInSeconds;
         uint tokenExpiration = _expirations[tokenId];
@@ -506,17 +510,7 @@ contract GatewayToken is
             networkData.supportedToken, 
             partiesInCharge
         );
-        // solhint-disable-next-line no-empty-blocks
-        try _chargeHandler.handleCharge{value: msg.value}(charge, networkId) {
-            // done
-        } catch (bytes memory reason) {
-            // Rethrow the custom error from the charge handler
-            // Using inline assembly here avoids the need to parse the revert reason
-            // solhint-disable-next-line no-inline-assembly
-            assembly {
-                revert(add(32, reason), mload(reason))
-            }
-        }
+        _chargeHandler.handleCharge{value: msg.value}(charge, networkId);
     }
 
     function _resolveTotalFeeAmount(FeeType feeType, IGatewayGatekeeper.GatekeeperNetworkData memory gatekeeperData, IGatewayNetwork.GatekeeperNetworkData memory networkData) internal pure returns(uint256, uint16) {
