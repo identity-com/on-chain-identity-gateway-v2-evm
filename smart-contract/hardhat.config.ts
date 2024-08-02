@@ -135,6 +135,7 @@ module.exports = {
   contractSizer: {
     runOnCompile: true,
     strict: true,
+    except: ['GatewayTokenInternalsTest', 'GatewayTokenUpgradeTest'],
   },
   paths: {
     sources: defaultPath,
