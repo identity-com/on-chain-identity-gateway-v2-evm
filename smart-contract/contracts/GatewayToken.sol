@@ -606,11 +606,6 @@ contract GatewayToken is
         return false; // transfers are restricted, so this can never pass
     }
 
-    /// @dev Checks if the sender has the specified role on the specified network and revert otherwise
-    function _checkSenderRole(bytes32 role, uint network) internal view {
-        _checkRole(role, network, _msgSender());
-    }
-
     function _checkGatekeeper(uint network) internal view {
         // Checks if message sender is a gatekeeper on the given network
         bool isGatekeeper = IGatewayNetwork(_gatewayNetworkContract).isGateKeeper(bytes32(network), _msgSender());
@@ -622,7 +617,6 @@ contract GatewayToken is
 
     /// @dev Checks if the token exists and is active. Optionally ignore expiry.
     /// Use this when you need to check if a token exists, and is not frozen or revoked
-    /// But you don't care about its expiry, e.g. you are extending the expiry.
     /// Reverts if tokenId does not exist.
     function _checkActiveToken(uint tokenId, bool allowExpired) internal view {
         // Reverts if tokenId does not exist.
