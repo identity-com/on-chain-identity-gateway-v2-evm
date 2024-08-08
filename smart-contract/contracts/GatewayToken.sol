@@ -346,10 +346,6 @@ contract GatewayToken is
     /**
      * @dev Triggered by external contract to verify the validity of the default token for `owner`.
      *
-<<<<<<< HEAD
-=======
-     * Checks owner has any token on gateway token contract, `tokenId` still active, and not expired. Reverts if tokenId does not exist.
->>>>>>> develop
      */
     function verifyToken(uint tokenId) external virtual returns (bool) {
         // Reverts if tokenId does not exist.
