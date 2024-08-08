@@ -23,7 +23,6 @@ contract GatewayStaking is IGatewayStaking, ParameterizedAccessControl, UUPSUpgr
    function depositStake(uint256 assests) public override returns(uint256) {
       // Deposit stake using ERC-4626 deposit method
       require(assests > 0, "Must deposit assets to receive shares");
-      _lastDepositTimestamp[msg.sender] = block.timestamp;
       return deposit(assests, msg.sender);
    }
 
@@ -38,6 +37,21 @@ contract GatewayStaking is IGatewayStaking, ParameterizedAccessControl, UUPSUpgr
       }
       // Redeem stake using ERC-4626 redeem method
       return redeem(shares, msg.sender, msg.sender);
+   }
+
+   function deposit(uint256 assets, address) public override returns (uint256) {
+    _lastDepositTimestamp[msg.sender] = block.timestamp;
+    return super.deposit(assets, msg.sender);
+   }
+
+   function redeem(uint256 shares, address, address) public override returns (uint256) {
+      // check if time lock has expired
+      uint256 lastDepositTimestamp = _lastDepositTimestamp[msg.sender];
+      if (block.timestamp < lastDepositTimestamp + DEPOSIT_TIMELOCK_TIME) {
+         revert GatewayStaking_Withdrawal_Locked(lastDepositTimestamp, lastDepositTimestamp + DEPOSIT_TIMELOCK_TIME);
+      }
+
+      return super.redeem(shares, msg.sender, msg.sender);
    }
 
    function setMinimumGatekeeperStake (uint256 minStakeAmount) public override onlySuperAdmin {

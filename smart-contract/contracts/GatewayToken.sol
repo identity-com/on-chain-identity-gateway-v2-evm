@@ -346,7 +346,6 @@ contract GatewayToken is
     /**
      * @dev Triggered by external contract to verify the validity of the default token for `owner`.
      *
-     * Checks owner has any token on gateway token contract, `tokenId` still active, and not expired. Reverts if tokenId does not exist.
      */
     function verifyToken(uint tokenId) external virtual returns (bool) {
         // Reverts if tokenId does not exist.
@@ -464,7 +463,6 @@ contract GatewayToken is
     }
 
     // includes the onlySuperAdmin modifier to ensure that only the super admin can call this function
-    // otherwise, no other logic.
     // solhint-disable-next-line no-empty-blocks
     function _authorizeUpgrade(address) internal override onlySuperAdmin {}
 
