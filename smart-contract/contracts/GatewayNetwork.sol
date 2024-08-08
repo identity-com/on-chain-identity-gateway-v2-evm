@@ -147,7 +147,7 @@ contract GatewayNetwork is ParameterizedAccessControl, IGatewayNetwork, UUPSUpgr
 
         GatekeeperNetworkData storage networkData = _networks[networkName];
 
-        require(networkData.gatekeepers.length <= 20, "Gateway network cannot have more than 20 gatekeepers");
+        require(networkData.gatekeepers.length <= 20, "Gateway network cannot have more than 21 gatekeepers");
   
         networkData.gatekeepers.push(gatekeeper);
 
