@@ -30,6 +30,11 @@ contract GatewayStaking is IGatewayStaking, ParameterizedAccessControl, UUPSUpgr
       // checks
       require(shares > 0, "Must burn shares to receive assets");
 
+      uint lastDepositTimestamp = _lastDepositTimestamp[msg.sender];
+      // check if time lock has expired
+      if(lastDepositTimestamp != 0 && block.timestamp < lastDepositTimestamp + DEPOSIT_TIMELOCK_TIME) {
+         revert GatewayStaking_Withdrawal_Locked(lastDepositTimestamp, lastDepositTimestamp + DEPOSIT_TIMELOCK_TIME);
+      }
       // Redeem stake using ERC-4626 redeem method
       return redeem(shares, msg.sender, msg.sender);
    }

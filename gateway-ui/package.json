@@ -51,7 +51,7 @@
   "dependencies": {
     "@fontsource/roboto": "^5.0.12",
     "@identity.com/did-bnb-client": "^2.0.2-beta",
-    "@identity.com/gateway-evm-ts-client": "^0.1.2",
+    "@identity.com/gateway-evm-ts-client": "^0.1.4",
     "ethers": "^5.7.0"
   },
   "peerDependencies": {
