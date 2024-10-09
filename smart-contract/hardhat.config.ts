@@ -32,57 +32,12 @@ const derivedAccounts = {
   count: 20,
 };
 const liveAccounts =
-  process.env.DEPLOYER_PRIVATE_KEY || process.env.PRIVATE_KEY
+  process.env.LOCAL_DEPLOY_PRIVATE_KEY || process.env.LOCAL_DEPLOY_PRIVATE_KEY
     ? [
-        `0x${process.env.DEPLOYER_PRIVATE_KEY || process.env.PRIVATE_KEY}`,
-        `0x${process.env.GATEKEEPER_PRIVATE_KEY || process.env.PRIVATE_KEY}`,
+        `0x${process.env.LOCAL_DEPLOY_PRIVATE_KEY || process.env.LOCAL_DEPLOY_PRIVATE_KEY}`,
+        `0x${process.env.LOCAL_DEPLOY_PRIVATE_KEY || process.env.LOCAL_DEPLOY_PRIVATE_KEY}`,
       ]
     : [];
-
-task('check-gt', 'check if a wallet has a gateway token for a particular gatekeeper network')
-  .addParam('address', 'The wallet to check')
-  .addParam('gatekeepernetwork', 'The gatekeeper network')
-  .setAction(checkGT);
-task('create-gatekeeper-network', 'create a gatekeeper network')
-  .addParam('gatekeepernetwork', 'The gatekeeper network to create')
-  .addParam('gatekeeper', 'The gatekeeper to add')
-  .addParam('name', 'The name of the new gatekeeper network')
-  .setAction(createGatekeeperNetwork);
-task('add-gatekeeper', 'add a gatekeeper to a network')
-  .addParam('gatekeeper', 'The gatekeeper to add')
-  .addParam('gatekeepernetwork', 'The gatekeeper network to add the gatekeeper to')
-  .setAction(addGatekeeper);
-task('remove-gatekeeper', 'remove a gatekeeper from a network')
-  .addParam('gatekeeper', 'The gatekeeper to remove')
-  .addParam('gatekeepernetwork', 'The gatekeeper network to remove the gatekeeper from')
-  .setAction(removeGatekeeper);
-task('issue-gt', 'issue a gateway token')
-  .addParam('gatekeepernetwork', 'The gatekeeper network to issue the token against')
-  .addParam('address', 'The wallet to issue the gateway token for')
-  .addFlag('forwarded', 'Forwards the transaction using an ERC2771 forwarder')
-  .setAction(issueGT);
-task('fund', 'fund a wallet')
-  .addParam('from', 'The funder wallet')
-  .addParam('to', 'The wallet to fund')
-  .addParam('amount', 'The amount in eth to send')
-  .addFlag('dryrun', 'Do not actually send the transaction')
-  .setAction(fund);
-task(
-  'print-private-key',
-  'Print the private key of a wallet used by hardhat (WARNING - DO NOT USE THIS FOR PRODUCTION KEYS)',
-)
-  .addParam('index', 'the index of the wallet to get the private key for')
-  .setAction(printPrivateKey);
-task('create-wallet', 'Create a test wallet').setAction(createWallet);
-task('add-forwarder', 'add a forwarder to the gateway token smart contract (e.g. to support a relayer)')
-  .addParam('forwarder', 'The forwarder to add')
-  .setAction(addForwarder);
-task('execute', 'sign and send a transaction')
-  .addParam('tx', 'the transaction to sign as a hex string')
-  .addParam('to', 'the recipient of the transaction')
-  .addParam('value', 'the amount to send with the transaction')
-  .setAction(execute);
-task('get-balance', 'get the balance of the deployer').setAction(getBalance);
 
 // Set the default contracts path to "contracts"
 const defaultPath = './contracts';
@@ -121,6 +76,11 @@ module.exports = {
       url: `${process.env.BNB_TESTNET_RPC_URL}`,
       accounts: liveAccounts,
       chainId: 97,
+    },
+    complereTestnet: {
+      url: `${process.env.BNB_TESTNET_RPC_URL}`,
+      accounts: liveAccounts,
+      chainId: 5918836757,
     }
   },
   solidity: {

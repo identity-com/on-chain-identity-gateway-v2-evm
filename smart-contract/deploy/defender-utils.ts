@@ -38,7 +38,9 @@ export async function getDeploymentSigner() {
   if(shouldUseDefender) {
     return await loadRelayerSigner();
   } else {
-    return new ethers.Wallet(process.env.LOCAL_DEPLOY_PRIVATE_KEY!);
+    const provider = new ethers.providers.JsonRpcProvider(process.env.BNB_TESTNET_RPC_URL!);
+
+    return new ethers.Wallet(process.env.LOCAL_DEPLOY_PRIVATE_KEY!, provider);
   }
 }
 

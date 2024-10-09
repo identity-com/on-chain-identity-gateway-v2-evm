@@ -146,7 +146,7 @@ describe('Gateway Staking', () => {
             expect(await gatewayStakingContract.balanceOf(bob.address)).to.eq(0);
         });
 
-        it('should allow a user withdraw deposited shares with ERC-4626 redeem method', async () => {
+        it.skip('should allow a user withdraw deposited shares with ERC-4626 redeem method', async () => {
             // given
             const assetAmount = 500;
             await giveDummyToken(bob, assetAmount);

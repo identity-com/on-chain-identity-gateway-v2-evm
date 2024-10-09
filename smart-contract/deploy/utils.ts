@@ -25,6 +25,18 @@ export const BNB_TESTNET_CONTRACT_ADDRESSES: GatewayProtocolContractAddresses = 
     trustedForwarder: "0x96b905ff1edfadaec03879450f3dc35a8124dc05"
 }
 
+export const COMPLERE_TESTNET_CONTRACT_ADDRESSES: GatewayProtocolContractAddresses = {
+    flagsStorage: "0x35df92b2dFc8C606a1D2FAfE26e6B66182Ef5822",
+    gatekeeper: "0x222Ba251eD01B60144ca220bEB9Ed17ED98e3AAe",
+    gatewayNetwork: "0xf4F929E10dD465aF803EC0fa70dA5898129392F3",
+    chargeHandler: "0x412338eABdB8c88F1d83E91DBc2d289fC18b4Deb",
+    gatewayStaking: "0x6B231070318e4a0B2047402336Df78C0b2721102",
+    erc20: "0xE331C1096e9317bF76E5B8815E6ac7487099c763",
+    gatewayToken: "0x8252B797EA14F0006818FaefA6b3dCFefa39eaEd",
+    forwarder: "0x567b21dCFacf0Ba2bfCF6B059833a083b7cDf6d1",
+    trustedForwarder: "0x567b21dCFacf0Ba2bfCF6B059833a083b7cDf6d1"
+}
+
 /**
  * Testnet wallets (foundry defaults)
  */
@@ -32,18 +44,18 @@ export const BNB_TESTNET_CONTRACT_ADDRESSES: GatewayProtocolContractAddresses = 
 export const DEFAULT_MNEMONIC =
   "test test test test test test test test test test test junk";
 
-
+// All addresses are default foundry addresses
 export const deployerWallet = new Wallet("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80");
 export const gatekeeperOneTestnetWallet = new Wallet("0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d"); // 0x70997970C51812dc3A010C7d01b50e0d17dc79C8
 export const gatekeeperTwoTestnetWallet = new Wallet("0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a"); // 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC
 export const userOneWallet = new Wallet("0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a"); // 0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
-export const testNetworkName = utils.formatBytes32String("Identity.com KYC Verification");
+export const testNetworkName = utils.formatBytes32String("Identity-KYC-Verification");
 
 
-export const testNetworkNameWithErc20Fees = "0x6e7574776f726b5f476974685f65726332305f66656573000000000000000000"; // gatekeeper 1
-export const testNetworkNameWithNativeFees = "0x6e6574776f726b5f776974685f6e61746976655f666565730000000000000000"; // gatekeeper 2
+export const testNetworkNameWithErc20Fees = "0x6e7574776f726b5f476974685f65726332305f66656573000000000000000000";
+export const testNetworkNameWithNativeFees = "0x6e6574776f726b5f776974685f6e61746976655f666565730000000000000000";
 
 export async function loadRelayerSigner(provider?: ethers.providers.Provider) {
     const credentials = {apiKey: process.env.DEFENDER_RELAY_API_KEY!, apiSecret: process.env.DEFENDER_RELAY_SECRET!};
