@@ -1,10 +1,10 @@
 import { addContractToAdmin, getDeploymentSigner, sleep, verify } from "./defender-utils";
 import { ethers , upgrades } from 'hardhat';
 import { Signer } from '@ethersproject/abstract-signer/src.ts'
-import { BNB_TESTNET_CONTRACT_ADDRESSES } from "./utils";
+import { BNB_TESTNET_CONTRACT_ADDRESSES, COMPLERE_TESTNET_CONTRACT_ADDRESSES } from "./utils";
 
 async function main() {
-    const testnetTokenContractAddress = BNB_TESTNET_CONTRACT_ADDRESSES.erc20;
+    const testnetTokenContractAddress = COMPLERE_TESTNET_CONTRACT_ADDRESSES.erc20;
 
     const args = [testnetTokenContractAddress , 'Identity Test Staking Vault', "ID_TEST_STAKE"];
     

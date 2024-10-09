@@ -10,7 +10,7 @@ async function main() {
     const signer: Signer = await getDeploymentSigner();
 
     const DummyERC20ContractFactory = await ethers.getContractFactory("DummyERC20", signer!);
-    const dummyERC20Contract = await DummyERC20ContractFactory.deploy(args);
+    const dummyERC20Contract = await DummyERC20ContractFactory.deploy(...args);
 
     await dummyERC20Contract.deployed();
     const deployedAddress = dummyERC20Contract.address;
@@ -19,7 +19,7 @@ async function main() {
 
     await sleep(6000);
 
-    await verify(deployedAddress,[]);
+    await verify(deployedAddress,args);
 
     // Need to wait to avoid rate limit
     await sleep(2000);

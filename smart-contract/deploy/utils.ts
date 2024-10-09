@@ -25,6 +25,18 @@ export const BNB_TESTNET_CONTRACT_ADDRESSES: GatewayProtocolContractAddresses = 
     trustedForwarder: "0x96b905ff1edfadaec03879450f3dc35a8124dc05"
 }
 
+export const COMPLERE_TESTNET_CONTRACT_ADDRESSES: GatewayProtocolContractAddresses = {
+    flagsStorage: "0x35df92b2dFc8C606a1D2FAfE26e6B66182Ef5822",
+    gatekeeper: "0x222Ba251eD01B60144ca220bEB9Ed17ED98e3AAe",
+    gatewayNetwork: "0xf4F929E10dD465aF803EC0fa70dA5898129392F3",
+    chargeHandler: "0x412338eABdB8c88F1d83E91DBc2d289fC18b4Deb",
+    gatewayStaking: "0x6B231070318e4a0B2047402336Df78C0b2721102",
+    erc20: "0xE331C1096e9317bF76E5B8815E6ac7487099c763",
+    gatewayToken: "0x8252B797EA14F0006818FaefA6b3dCFefa39eaEd",
+    forwarder: "0x567b21dCFacf0Ba2bfCF6B059833a083b7cDf6d1",
+    trustedForwarder: "0x567b21dCFacf0Ba2bfCF6B059833a083b7cDf6d1"
+}
+
 /**
  * Testnet wallets (foundry defaults)
  */

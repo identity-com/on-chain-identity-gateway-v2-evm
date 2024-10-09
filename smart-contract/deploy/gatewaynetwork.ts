@@ -1,12 +1,12 @@
 import { addContractToAdmin, sleep, verify, getDeploymentSigner } from "./defender-utils";
 import { Signer } from '@ethersproject/abstract-signer/src.ts'
 import { ethers, upgrades } from 'hardhat';
-import { BNB_TESTNET_CONTRACT_ADDRESSES } from "./utils";
+import { BNB_TESTNET_CONTRACT_ADDRESSES, COMPLERE_TESTNET_CONTRACT_ADDRESSES } from "./utils";
 
 
 async function main() {
-    const testnetGatekeeperContractAddress = BNB_TESTNET_CONTRACT_ADDRESSES.gatekeeper;
-    const testnetStakingContractAddress = BNB_TESTNET_CONTRACT_ADDRESSES.gatewayStaking;
+    const testnetGatekeeperContractAddress = COMPLERE_TESTNET_CONTRACT_ADDRESSES.gatekeeper;
+    const testnetStakingContractAddress = COMPLERE_TESTNET_CONTRACT_ADDRESSES.gatewayStaking;
 
     const signer: Signer = await getDeploymentSigner();
     const signerAddress = await signer.getAddress();
