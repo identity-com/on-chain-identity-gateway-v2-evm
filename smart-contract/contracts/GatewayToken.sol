@@ -338,7 +338,7 @@ contract GatewayToken is
      *
      * Checks owner has any token on gateway token contract, `tokenId` still active, and not expired.
      */
-    function verifyToken(address owner, uint network) external virtual returns (bool) {
+    function verifyToken(address owner, uint network) external  view virtual returns (bool) {
         (, uint count) = _getTokenIdsByOwnerAndNetwork(owner, network, true);
         return count > 0;
     }
@@ -347,7 +347,7 @@ contract GatewayToken is
      * @dev Triggered by external contract to verify the validity of the default token for `owner`.
      *
      */
-    function verifyToken(uint tokenId) external virtual returns (bool) {
+    function verifyToken(uint tokenId) external view virtual returns (bool) {
         // Reverts if tokenId does not exist.
         bool doesExistAndIsActive = _existsAndActive(tokenId, false);
 
