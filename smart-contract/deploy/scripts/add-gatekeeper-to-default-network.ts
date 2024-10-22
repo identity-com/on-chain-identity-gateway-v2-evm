@@ -1,20 +1,22 @@
 import { sleep, getDeploymentSigner } from "../defender-utils";
 import hre , { ethers, upgrades } from "hardhat";
 import { Signer } from '@ethersproject/abstract-signer/src.ts'
-import { COMPLERE_TESTNET_CONTRACT_ADDRESSES, ZERO_ADDRESS, gatekeeperOneTestnetWallet, gatekeeperTwoTestnetWallet, testNetworkName, testNetworkNameWithErc20Fees, testNetworkNameWithNativeFees, trustSwiftlyTestnetGatekeeperWallet } from "../utils";
+import { BNB_TESTNET_CONTRACT_ADDRESSES, COMPLERE_TESTNET_CONTRACT_ADDRESSES, ZERO_ADDRESS, gatekeeperOneTestnetWallet, gatekeeperTwoTestnetWallet, testNetworkName, testNetworkNameWithErc20Fees, testNetworkNameWithNativeFees, trustSwiftlyTestnetGatekeeperWallet } from "../utils";
 import { GatewayNetwork, GatewayToken, IGatewayNetwork } from "../../typechain-types";
 
 async function main() {    
     let signer: Signer;
     signer = await getDeploymentSigner();
 
-    const gatewayNetworkContractAddress = COMPLERE_TESTNET_CONTRACT_ADDRESSES.gatewayNetwork;
+    const gatewayNetworkContractAddress = BNB_TESTNET_CONTRACT_ADDRESSES.gatewayNetwork;
 
     const NetworkContractFactory = await ethers.getContractFactory("GatewayNetwork", signer!);
     const networkContract = NetworkContractFactory.attach(gatewayNetworkContractAddress) as GatewayNetwork;
 
     
-    await networkContract.connect(signer!).addGatekeeper(await signer.getAddress(), testNetworkName);
+    const tx = await networkContract.connect(signer!).addGatekeeper("0xBae36244AdaDe42247dd31e8cFaECb0a1F0e4570", testNetworkName);
+
+    console.log(JSON.stringify(tx))
 }
 
 
