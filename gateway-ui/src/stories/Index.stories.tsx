@@ -34,14 +34,14 @@ type Story = StoryObj<typeof CollapsableGatewayPortal>;
 export const WalletWithToken: Story = {
     args: {
       userWallet: new Wallet(foundryDefaultPKWithToken, publicRPC),
-      networkName: "Identity.com KYC Verification"
+      networkName: "Identity-KYC-Verification"
   },
 };
 
 export const WalletWithoutToken: Story = {
   args: {
     userWallet: Wallet.createRandom().connect(publicRPC),
-    networkName: "Identity.com KYC Verification"
+    networkName: "Identity-KYC-Verification"
   },
 };
 
