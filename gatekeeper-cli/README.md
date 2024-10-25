@@ -26,10 +26,10 @@ yarn global add @identity.com/gateway-eth-cli
 
 TIP: run `gateway-eth <command> -h` to see all options at any time.
 
-TIP: The CLI uses Infura. Add an infura API key to your environment to avoid rate-limiting:
+## Verify an address on a network
 
 ```shell
-export INFURA_API_KEY=your-api-key
+gateway-eth verify-address <your address> <networkId
 ```
 
 ## Add a gatekeeper
