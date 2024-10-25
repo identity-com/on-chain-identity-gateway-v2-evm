@@ -29,7 +29,7 @@ TIP: run `gateway-eth <command> -h` to see all options at any time.
 ## Verify an address on a network
 
 ```shell
-gateway-eth verify-address <your address> <networkId
+gateway-eth verify-address <your address> <networkId>
 ```
 
 ## Add a gatekeeper
