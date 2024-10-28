@@ -166,6 +166,7 @@ export const useGatewayPortal = (props: GatewayPortalProps) => {
                                 issuerAlias: resolvedConfig.displayName,
                                 issuanceFee: issuer.issuanceFee,
                                 passRequestLink: `${resolvedConfig.gatewayIssuerEndpoint}?chain_id=${chainId}&wallet_address=${address.slice(2)}`
+
                             }
                         }
                     }
