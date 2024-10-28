@@ -141,7 +141,7 @@ export const useGatewayPortal = (props: GatewayPortalProps) => {
         const loadGatekeeperIssuerData = async () => {
             // If we need to look up the service endpoint of each gatekeeper
             const provider = await userWallet.provider;
-            const address = userWallet.getAddress();
+            const address = await userWallet.getAddress();
             const chainId = await userWallet.getChainId();
 
             if(portalData && portalData.invalidPassData) {
@@ -165,7 +165,7 @@ export const useGatewayPortal = (props: GatewayPortalProps) => {
                             return {
                                 issuerAlias: resolvedConfig.displayName,
                                 issuanceFee: issuer.issuanceFee,
-                                passRequestLink: `${resolvedConfig.gatewayIssuerEndpoint}?chain_id=${chainId}&wallet_address=${address}`
+                                passRequestLink: `${resolvedConfig.gatewayIssuerEndpoint}?chain_id=${chainId}&wallet_address=${address.slice(2)}`
                             }
                         }
                     }
